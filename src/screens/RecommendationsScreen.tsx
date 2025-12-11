@@ -13,11 +13,16 @@ import { generateRecommendations } from '../services/recommendationEngine';
 import { RecommendationCard } from '../components/RecommendationCard';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { useNavigation } from '@react-navigation/native';
+import { CompositeNavigationProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { RootStackParamList, MainTabParamList } from '../navigation/AppNavigator';
 import { COLORS } from '../utils/constants';
 
-type RecommendationsScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Recommendations'>;
+type RecommendationsScreenNavigationProp = CompositeNavigationProp<
+  BottomTabNavigationProp<MainTabParamList, 'Benefits'>,
+  StackNavigationProp<RootStackParamList>
+>;
 
 export const RecommendationsScreen: React.FC = () => {
   const navigation = useNavigation<RecommendationsScreenNavigationProp>();
@@ -61,10 +66,7 @@ export const RecommendationsScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Recommendations</Text>
-        <Text style={styles.subtitle}>
-          {recommendations.length} opportunities
-        </Text>
+        <Text style={styles.title}>All Current Deals</Text>
       </View>
 
       {recommendations.length > 0 && (

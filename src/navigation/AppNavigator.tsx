@@ -1,28 +1,50 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { HomeScreen } from '../screens/HomeScreen';
 import { TransactionsScreen } from '../screens/TransactionsScreen';
 import { RecommendationsScreen } from '../screens/RecommendationsScreen';
 import { GiftCardDetailScreen } from '../screens/GiftCardDetailScreen';
 import { PlaidConnectScreen } from '../screens/PlaidConnectScreen';
+import { BottomTabBar } from '../components/BottomTabBar';
 import { COLORS } from '../utils/constants';
 
 export type RootStackParamList = {
-  Home: undefined;
+  MainTabs: { screen?: keyof MainTabParamList } | undefined;
   Transactions: undefined;
-  Recommendations: undefined;
   GiftCardDetail: { recommendation: any };
-  PlaidConnect: undefined;
+};
+
+export type MainTabParamList = {
+  Home: undefined;
+  Benefits: undefined;
+  ConnectBank: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
+const Tab = createBottomTabNavigator<MainTabParamList>();
+
+const MainTabNavigator: React.FC = () => {
+  return (
+    <Tab.Navigator
+      tabBar={(props) => <BottomTabBar {...props} />}
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Benefits" component={RecommendationsScreen} />
+      <Tab.Screen name="ConnectBank" component={PlaidConnectScreen} />
+    </Tab.Navigator>
+  );
+};
 
 export const AppNavigator: React.FC = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Home"
+        initialRouteName="MainTabs"
         screenOptions={{
           headerStyle: {
             backgroundColor: COLORS.primary,
@@ -31,8 +53,8 @@ export const AppNavigator: React.FC = () => {
         }}
       >
         <Stack.Screen
-          name="Home"
-          component={HomeScreen}
+          name="MainTabs"
+          component={MainTabNavigator}
           options={{
             headerShown: false,
           }}
@@ -45,24 +67,10 @@ export const AppNavigator: React.FC = () => {
           }}
         />
         <Stack.Screen
-          name="Recommendations"
-          component={RecommendationsScreen}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
           name="GiftCardDetail"
           component={GiftCardDetailScreen}
           options={{
             title: 'Gift Card Details',
-          }}
-        />
-        <Stack.Screen
-          name="PlaidConnect"
-          component={PlaidConnectScreen}
-          options={{
-            headerShown: false,
           }}
         />
       </Stack.Navigator>

@@ -60,6 +60,39 @@ export const GiftCardDetailScreen: React.FC = () => {
         </View>
 
         <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Gift Card Information</Text>
+          
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Source</Text>
+            <Text style={styles.infoValue}>{recommendation.giftCard.source}</Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Gift Card Value</Text>
+            <Text style={styles.infoValue}>
+              {formatCurrency(recommendation.giftCard.availableAmount)}
+            </Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Price</Text>
+            <Text style={styles.infoValue}>
+              {formatCurrency(
+                recommendation.giftCard.availableAmount * 
+                (1 - recommendation.giftCard.discountPercent / 100)
+              )}
+            </Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.infoLabel}>Discount</Text>
+            <Text style={styles.infoValue}>
+              {formatPercent(recommendation.giftCard.discountPercent)}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.section}>
           <Text style={styles.sectionTitle}>Merchant Details</Text>
           
           <View style={styles.infoRow}>
@@ -85,29 +118,6 @@ export const GiftCardDetailScreen: React.FC = () => {
             <Text style={styles.infoLabel}>Average Transaction</Text>
             <Text style={styles.infoValue}>
               {formatCurrency(recommendation.merchant.averageTransaction)}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Gift Card Information</Text>
-          
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Source</Text>
-            <Text style={styles.infoValue}>{recommendation.giftCard.source}</Text>
-          </View>
-
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Available Amount</Text>
-            <Text style={styles.infoValue}>
-              {formatCurrency(recommendation.giftCard.availableAmount)}
-            </Text>
-          </View>
-
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Discount</Text>
-            <Text style={styles.infoValue}>
-              {formatPercent(recommendation.giftCard.discountPercent)}
             </Text>
           </View>
         </View>

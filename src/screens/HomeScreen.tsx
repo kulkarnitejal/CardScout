@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -6,21 +6,34 @@ import {
   ScrollView,
   RefreshControl,
   TouchableOpacity,
+  FlatList,
+  Dimensions,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { CompositeNavigationProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../navigation/AppNavigator';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import { RootStackParamList, MainTabParamList } from '../navigation/AppNavigator';
 import { Transaction, Recommendation } from '../types';
 import { generateMockTransactions } from '../services/mockTransactions';
 import { analyzeMerchants } from '../services/merchantAnalyzer';
 import { generateRecommendations } from '../services/recommendationEngine';
 import { loadTransactions, saveTransactions } from '../services/storageService';
-import { RecommendationCard } from '../components/RecommendationCard';
+import { FeaturedRecommendationCard } from '../components/FeaturedRecommendationCard';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { formatCurrency } from '../utils/formatters';
 import { COLORS } from '../utils/constants';
 
-type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const CARD_WIDTH = SCREEN_WIDTH - 48; // 12px carousel padding + 12px card margin on each side
+const SNAP_INTERVAL = CARD_WIDTH + 24; // Card width + margins
+
+type HomeScreenNavigationProp = CompositeNavigationProp<
+  BottomTabNavigationProp<MainTabParamList, 'Home'>,
+  StackNavigationProp<RootStackParamList>
+>;
 
 export const HomeScreen: React.FC = () => {
   const navigation = useNavigation<HomeScreenNavigationProp>();
@@ -28,6 +41,8 @@ export const HomeScreen: React.FC = () => {
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => {
     loadData();
@@ -63,6 +78,12 @@ export const HomeScreen: React.FC = () => {
     setRefreshing(false);
   };
 
+  const onScroll = (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const scrollPosition = event.nativeEvent.contentOffset.x;
+    const index = Math.round(scrollPosition / SNAP_INTERVAL);
+    setCurrentCardIndex(index);
+  };
+
   const totalSavings = recommendations.reduce(
     (sum, rec) => sum + rec.annualSavings,
     0
@@ -75,16 +96,18 @@ export const HomeScreen: React.FC = () => {
   }
 
   return (
-    <ScrollView
-      style={styles.container}
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      <View style={styles.header}>
-        <Text style={styles.title}>Gift Card Maxing</Text>
-        <Text style={styles.subtitle}>Maximize your savings</Text>
+    <View style={styles.container}>
+      <View style={styles.stickyHeader}>
+        <Text style={styles.title}>Card Scout</Text>
+        <Text style={styles.subtitle}>Maximize your savings, maximize your life</Text>
       </View>
+      <ScrollView
+        style={styles.scrollContent}
+        contentContainerStyle={styles.scrollContentContainer}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
 
       <View style={styles.statsContainer}>
         <View style={styles.statCard}>
@@ -99,9 +122,24 @@ export const HomeScreen: React.FC = () => {
 
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Top Recommendations</Text>
+          <View>
+            <Text style={styles.sectionTitle}>Your Featured Benefits</Text>
+            <Text style={styles.sectionSubtitle}>
+              {new Date().toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                month: 'short', 
+                day: 'numeric' 
+              })}
+            </Text>
+          </View>
           <TouchableOpacity
-            onPress={() => navigation.navigate('Recommendations')}
+            onPress={() => {
+              // Navigate to Benefits tab
+              const parent = navigation.getParent();
+              if (parent) {
+                parent.navigate('MainTabs', { screen: 'Benefits' });
+              }
+            }}
           >
             <Text style={styles.seeAll}>See All</Text>
           </TouchableOpacity>
@@ -114,41 +152,87 @@ export const HomeScreen: React.FC = () => {
             </Text>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => navigation.navigate('PlaidConnect')}
+              onPress={() => {
+                // Navigate to Connect Bank tab
+                const parent = navigation.getParent();
+                if (parent) {
+                  parent.navigate('MainTabs', { screen: 'ConnectBank' });
+                }
+              }}
             >
               <Text style={styles.buttonText}>Connect Bank Account</Text>
             </TouchableOpacity>
           </View>
         ) : (
-          recommendations.slice(0, 3).map((rec) => (
-            <RecommendationCard
-              key={rec.id}
-              recommendation={rec}
-              onPress={() =>
-                navigation.navigate('GiftCardDetail', { recommendation: rec })
-              }
+          <>
+            <FlatList
+              ref={flatListRef}
+              data={recommendations.slice(0, 5)}
+              keyExtractor={(item) => item.id}
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              snapToInterval={SNAP_INTERVAL}
+              decelerationRate="fast"
+              onScroll={onScroll}
+              scrollEventThrottle={16}
+              renderItem={({ item }) => (
+                <FeaturedRecommendationCard
+                  recommendation={item}
+                  onPress={() =>
+                    navigation.navigate('GiftCardDetail', { recommendation: item })
+                  }
+                />
+              )}
+              contentContainerStyle={styles.carouselContent}
             />
-          ))
+            {recommendations.length > 1 && (
+              <View style={styles.pagination}>
+                {recommendations.slice(0, 5).map((_, index) => (
+                  <View
+                    key={index}
+                    style={[
+                      styles.paginationDot,
+                      index === currentCardIndex && styles.paginationDotActive,
+                    ]}
+                  />
+                ))}
+              </View>
+            )}
+          </>
         )}
       </View>
 
       <View style={styles.quickActions}>
         <TouchableOpacity
           style={styles.actionButton}
-          onPress={() => navigation.navigate('Transactions')}
+          onPress={() => {
+            // Navigate to Transactions screen in stack
+            const parent = navigation.getParent();
+            if (parent) {
+              parent.navigate('Transactions');
+            }
+          }}
         >
           <Text style={styles.actionButtonText}>View Transactions</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.actionButton, styles.secondaryButton]}
-          onPress={() => navigation.navigate('PlaidConnect')}
+          onPress={() => {
+            // Navigate to Connect Bank tab
+            const parent = navigation.getParent();
+            if (parent) {
+              parent.navigate('MainTabs', { screen: 'ConnectBank' });
+            }
+          }}
         >
           <Text style={[styles.actionButtonText, styles.secondaryButtonText]}>
             Connect Bank
           </Text>
         </TouchableOpacity>
       </View>
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 };
 
@@ -157,10 +241,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: COLORS.background,
   },
-  header: {
+  stickyHeader: {
     backgroundColor: COLORS.primary,
     padding: 24,
     paddingTop: 60,
+    zIndex: 1000,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+  },
+  scrollContent: {
+    flex: 1,
+  },
+  scrollContentContainer: {
+    paddingBottom: 100, // Space for bottom navigation
   },
   title: {
     fontSize: 32,
@@ -207,17 +303,46 @@ const styles = StyleSheet.create({
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     paddingHorizontal: 16,
-    marginBottom: 12,
+    marginBottom: 16,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: '700',
     color: COLORS.text,
+    marginBottom: 4,
+  },
+  sectionSubtitle: {
+    fontSize: 14,
+    color: COLORS.textSecondary,
+  },
+  carouselContent: {
+    paddingHorizontal: 12,
+  },
+  pagination: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 16,
+    marginBottom: 8,
+  },
+  paginationDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: COLORS.textSecondary,
+    opacity: 0.3,
+    marginHorizontal: 4,
+  },
+  paginationDotActive: {
+    width: 24,
+    opacity: 1,
+    backgroundColor: COLORS.primary,
   },
   seeAll: {
-    fontSize: 14,
+    padding: 6,
+    fontSize: 16,
     color: COLORS.primary,
     fontWeight: '600',
   },
