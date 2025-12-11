@@ -1,0 +1,16 @@
+export const MIN_MONTHLY_SPENDING = 50;
+export const MIN_DISCOUNT_THRESHOLD = 5;
+export const TOP_RECOMMENDATIONS_COUNT = 10;
+
+export const COLORS = {
+  primary: '#6200ee',
+  secondary: '#03dac6',
+  background: '#f5f5f5',
+  surface: '#ffffff',
+  error: '#b00020',
+  text: '#000000',
+  textSecondary: '#757575',
+  success: '#4caf50',
+  warning: '#ff9800',
+};
+
