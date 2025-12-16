@@ -31,6 +31,6 @@ export interface Recommendation {
   potentialSavings: number;
   monthlySpending: number;
   annualSavings: number;
-  savingsPercent: number;
+  savingsPercent: integer;
 }
 

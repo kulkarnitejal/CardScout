@@ -1,23 +1,53 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Dimensions, Linking } from 'react-native';
 import { Recommendation } from '../types';
 import { formatCurrency, formatPercent } from '../utils/formatters';
-import { COLORS } from '../utils/constants';
+import { COLORS, FONTS } from '../utils/constants';
 
 interface FeaturedRecommendationCardProps {
   recommendation: Recommendation;
-  onPress?: () => void;
+  onViewDetails?: () => void;
+  onBuyNow?: () => void;
 }
+
+// Map gift card sources to their website URLs
+const getSourceUrl = (source: string, merchant: string): string => {
+  const sourceMap: { [key: string]: string } = {
+    'GiftCardMarketplace': 'https://www.giftcardmarketplace.com',
+    'CardCash': 'https://www.cardcash.com',
+    'Raise': 'https://www.raise.com',
+  };
+  
+  const baseUrl = sourceMap[source] || 'https://www.google.com/search?q=' + encodeURIComponent(`${merchant} gift card`);
+  return baseUrl;
+};
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH - 48; // 24px padding on each side
 
 export const FeaturedRecommendationCard: React.FC<FeaturedRecommendationCardProps> = ({
   recommendation,
-  onPress,
+  onViewDetails,
+  onBuyNow,
 }) => {
   const giftCardPrice = recommendation.giftCard.availableAmount * 
     (1 - recommendation.giftCard.discountPercent / 100);
+
+  const handleBuyNow = async () => {
+    if (onBuyNow) {
+      onBuyNow();
+    } else {
+      const url = getSourceUrl(recommendation.giftCard.source, recommendation.merchant.name);
+      try {
+        const supported = await Linking.canOpenURL(url);
+        if (supported) {
+          await Linking.openURL(url);
+        }
+      } catch (error) {
+        console.error('Error opening URL:', error);
+      }
+    }
+  };
 
   const CardContent = (
     <View style={styles.container}>
@@ -63,12 +93,20 @@ export const FeaturedRecommendationCard: React.FC<FeaturedRecommendationCardProp
             Pay {formatCurrency(giftCardPrice)} • Save {formatPercent(recommendation.giftCard.discountPercent)}
           </Text>
         </View>
-        <TouchableOpacity 
-          style={styles.actionButton}
-          onPress={onPress}
-        >
-          <Text style={styles.actionButtonText}>View Details</Text>
-        </TouchableOpacity>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity 
+            style={styles.viewDetailsButton}
+            onPress={onViewDetails}
+          >
+            <Text style={styles.viewDetailsButtonText}>View Details</Text>
+          </TouchableOpacity>
+          <TouchableOpacity 
+            style={styles.actionButton}
+            onPress={handleBuyNow}
+          >
+            <Text style={styles.actionButtonText}>Buy Now</Text>
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -104,6 +142,7 @@ const styles = StyleSheet.create({
   },
   categoryBadgeText: {
     fontSize: 12,
+    fontFamily: FONTS.semiBold,
     fontWeight: '600',
     color: COLORS.textSecondary,
   },
@@ -116,6 +155,7 @@ const styles = StyleSheet.create({
   discountText: {
     color: '#fff',
     fontSize: 14,
+    fontFamily: FONTS.bold,
     fontWeight: '700',
   },
   contentSection: {
@@ -124,6 +164,7 @@ const styles = StyleSheet.create({
   },
   merchantName: {
     fontSize: 28,
+    fontFamily: FONTS.bold,
     fontWeight: '700',
     color: COLORS.text,
     marginBottom: 12,
@@ -131,6 +172,7 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 16,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
     lineHeight: 22,
     marginBottom: 20,
@@ -148,11 +190,13 @@ const styles = StyleSheet.create({
   },
   savingsBoxLabel: {
     fontSize: 12,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
     marginBottom: 4,
   },
   savingsBoxValue: {
     fontSize: 24,
+    fontFamily: FONTS.bold,
     fontWeight: '700',
     color: COLORS.success,
   },
@@ -161,6 +205,7 @@ const styles = StyleSheet.create({
   },
   savingsBoxSmallText: {
     fontSize: 12,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
   },
   footerSection: {
@@ -173,28 +218,53 @@ const styles = StyleSheet.create({
   },
   priceLabel: {
     fontSize: 12,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
     marginBottom: 4,
   },
   priceValue: {
     fontSize: 20,
+    fontFamily: FONTS.bold,
     fontWeight: '700',
     color: COLORS.text,
     marginBottom: 4,
   },
   priceSubtext: {
     fontSize: 14,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
   },
+  buttonContainer: {
+    flexDirection: 'row',
+  },
+  viewDetailsButton: {
+    flex: 1,
+    backgroundColor: COLORS.surface,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    marginRight: 6,
+  },
+  viewDetailsButtonText: {
+    color: COLORS.primary,
+    fontSize: 14,
+    fontFamily: FONTS.semiBold,
+    fontWeight: '600',
+  },
   actionButton: {
+    flex: 1,
     backgroundColor: COLORS.primary,
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
+    marginLeft: 6,
   },
   actionButtonText: {
     color: '#fff',
     fontSize: 16,
+    fontFamily: FONTS.bold,
     fontWeight: '700',
   },
 });

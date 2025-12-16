@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Merchant } from '../types';
 import { formatCurrency, formatDateShort } from '../utils/formatters';
-import { COLORS } from '../utils/constants';
+import { COLORS, FONTS } from '../utils/constants';
 
 interface MerchantCardProps {
   merchant: Merchant;
@@ -58,12 +58,14 @@ const styles = StyleSheet.create({
   },
   name: {
     fontSize: 18,
+    fontFamily: FONTS.bold,
     fontWeight: '700',
     color: COLORS.text,
     marginBottom: 4,
   },
   category: {
     fontSize: 14,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
   },
   statsContainer: {
@@ -79,16 +81,19 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 12,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
     marginBottom: 4,
   },
   statValue: {
     fontSize: 16,
+    fontFamily: FONTS.semiBold,
     fontWeight: '600',
     color: COLORS.primary,
   },
   lastTransaction: {
     fontSize: 12,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
     textAlign: 'right',
   },

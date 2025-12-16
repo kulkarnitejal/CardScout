@@ -10,7 +10,7 @@ import { Transaction } from '../types';
 import { loadTransactions } from '../services/storageService';
 import { TransactionCard } from '../components/TransactionCard';
 import { LoadingSpinner } from '../components/LoadingSpinner';
-import { COLORS } from '../utils/constants';
+import { COLORS, FONTS } from '../utils/constants';
 
 export const TransactionsScreen: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -82,12 +82,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
+    fontFamily: FONTS.bold,
     fontWeight: '700',
     color: '#fff',
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 16,
+    fontFamily: FONTS.regular,
     color: '#fff',
     opacity: 0.9,
   },
@@ -100,6 +102,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 16,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
   },
 });

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { COLORS } from '../utils/constants';
+import { COLORS, FONTS } from '../utils/constants';
 
 interface Tab {
   name: string;
@@ -113,10 +113,12 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 12,
+    fontFamily: FONTS.medium,
     color: COLORS.textSecondary,
     fontWeight: '500',
   },
   labelFocused: {
+    fontFamily: FONTS.bold,
     color: COLORS.primary,
     fontWeight: '700',
   },

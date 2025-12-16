@@ -1,9 +1,21 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Linking } from 'react-native';
 import { RouteProp, useRoute } from '@react-navigation/native';
 import { Recommendation } from '../types';
 import { formatCurrency, formatPercent } from '../utils/formatters';
-import { COLORS } from '../utils/constants';
+import { COLORS, FONTS } from '../utils/constants';
+
+// Map gift card sources to their website URLs
+const getSourceUrl = (source: string, merchant: string): string => {
+  const sourceMap: { [key: string]: string } = {
+    'GiftCardMarketplace': 'https://www.giftcardmarketplace.com',
+    'CardCash': 'https://www.cardcash.com',
+    'Raise': 'https://www.raise.com',
+  };
+  
+  const baseUrl = sourceMap[source] || 'https://www.google.com/search?q=' + encodeURIComponent(`${merchant} gift card`);
+  return baseUrl;
+};
 
 type GiftCardDetailRouteParams = {
   GiftCardDetail: {
@@ -15,10 +27,28 @@ export const GiftCardDetailScreen: React.FC = () => {
   const route = useRoute<RouteProp<GiftCardDetailRouteParams, 'GiftCardDetail'>>();
   const { recommendation } = route.params;
 
+  const handleBuyNow = async () => {
+    const url = getSourceUrl(recommendation.giftCard.source, recommendation.merchant.name);
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+      }
+    } catch (error) {
+      console.error('Error opening URL:', error);
+    }
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.merchantName}>{recommendation.merchant.name}</Text>
+        <TouchableOpacity 
+            style={styles.actionButton}
+            onPress={handleBuyNow}
+          >
+            <Text style={styles.actionButtonText}>Buy Now</Text>
+          </TouchableOpacity>
         <View style={styles.discountBadge}>
           <Text style={styles.discountText}>
             {formatPercent(recommendation.savingsPercent)} OFF
@@ -147,6 +177,7 @@ const styles = StyleSheet.create({
   },
   merchantName: {
     fontSize: 28,
+    fontFamily: FONTS.bold,
     fontWeight: '700',
     color: '#fff',
     flex: 1,
@@ -160,6 +191,7 @@ const styles = StyleSheet.create({
   discountText: {
     color: '#fff',
     fontSize: 16,
+    fontFamily: FONTS.bold,
     fontWeight: '700',
   },
   content: {
@@ -178,6 +210,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
+    fontFamily: FONTS.bold,
     fontWeight: '700',
     color: COLORS.text,
     marginBottom: 16,
@@ -192,10 +225,12 @@ const styles = StyleSheet.create({
   },
   infoLabel: {
     fontSize: 16,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
   },
   infoValue: {
     fontSize: 16,
+    fontFamily: FONTS.semiBold,
     fontWeight: '600',
     color: COLORS.text,
   },
@@ -204,6 +239,7 @@ const styles = StyleSheet.create({
   },
   annualSavings: {
     fontSize: 20,
+    fontFamily: FONTS.bold,
     fontWeight: '700',
     color: COLORS.success,
   },
@@ -217,8 +253,23 @@ const styles = StyleSheet.create({
   },
   noteText: {
     fontSize: 14,
+    fontFamily: FONTS.regular,
     color: COLORS.text,
     lineHeight: 20,
+  },
+  actionButton: {
+    backgroundColor: COLORS.primary,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    marginLeft: 12,
+  },
+  actionButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: FONTS.bold,
+    fontWeight: '700',
   },
 });
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Recommendation } from '../types';
 import { formatCurrency, formatPercent } from '../utils/formatters';
-import { COLORS } from '../utils/constants';
+import { COLORS, FONTS } from '../utils/constants';
 
 interface RecommendationCardProps {
   recommendation: Recommendation;
@@ -20,10 +20,17 @@ export const RecommendationCard: React.FC<RecommendationCardProps> = ({
           <Text style={styles.merchantName}>{recommendation.merchant.name}</Text>
           <Text style={styles.category}>{recommendation.merchant.category}</Text>
         </View>
-        <View style={styles.discountBadge}>
-          <Text style={styles.discountText}>
-            {formatPercent(recommendation.savingsPercent)} OFF
-          </Text>
+        <View style={styles.headerRight}>
+          <View style={styles.discountBadge}>
+            <Text style={styles.discountText}>
+              {formatPercent(recommendation.savingsPercent)} OFF
+            </Text>
+          </View>
+          {onPress && (
+            <View style={styles.arrowContainer}>
+              <Text style={styles.arrow}>›</Text>
+            </View>
+          )}
         </View>
       </View>
 
@@ -94,14 +101,32 @@ const styles = StyleSheet.create({
   merchantInfo: {
     flex: 1,
   },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 12,
+  },
+  arrowContainer: {
+    marginLeft: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  arrow: {
+    fontSize: 24,
+    color: COLORS.primary,
+    fontFamily: FONTS.bold,
+    fontWeight: '700',
+  },
   merchantName: {
     fontSize: 20,
+    fontFamily: FONTS.bold,
     fontWeight: '700',
     color: COLORS.text,
     marginBottom: 4,
   },
   category: {
     fontSize: 14,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
   },
   discountBadge: {
@@ -113,6 +138,7 @@ const styles = StyleSheet.create({
   discountText: {
     color: '#fff',
     fontSize: 14,
+    fontFamily: FONTS.bold,
     fontWeight: '700',
   },
   savingsContainer: {
@@ -129,15 +155,18 @@ const styles = StyleSheet.create({
   },
   savingsLabel: {
     fontSize: 14,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
   },
   savingsValue: {
     fontSize: 16,
+    fontFamily: FONTS.semiBold,
     fontWeight: '600',
     color: COLORS.text,
   },
   annualSavings: {
     fontSize: 18,
+    fontFamily: FONTS.bold,
     color: COLORS.success,
     fontWeight: '700',
   },
@@ -151,10 +180,12 @@ const styles = StyleSheet.create({
   },
   source: {
     fontSize: 12,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
   },
   availableAmount: {
     fontSize: 12,
+    fontFamily: FONTS.semiBold,
     color: COLORS.primary,
     fontWeight: '600',
   },

@@ -6,7 +6,7 @@ import {
   TouchableOpacity,
   Alert,
 } from 'react-native';
-import { COLORS } from '../utils/constants';
+import { COLORS, FONTS } from '../utils/constants';
 
 export const PlaidConnectScreen: React.FC = () => {
   const [connecting, setConnecting] = useState(false);
@@ -89,12 +89,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
+    fontFamily: FONTS.bold,
     fontWeight: '700',
     color: '#fff',
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 16,
+    fontFamily: FONTS.regular,
     color: '#fff',
     opacity: 0.9,
   },
@@ -114,12 +116,14 @@ const styles = StyleSheet.create({
   },
   infoTitle: {
     fontSize: 20,
+    fontFamily: FONTS.bold,
     fontWeight: '700',
     color: COLORS.text,
     marginBottom: 12,
   },
   infoText: {
     fontSize: 16,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
     lineHeight: 24,
   },
@@ -138,12 +142,14 @@ const styles = StyleSheet.create({
   },
   securityTitle: {
     fontSize: 18,
+    fontFamily: FONTS.bold,
     fontWeight: '700',
     color: COLORS.text,
     marginBottom: 8,
   },
   securityText: {
     fontSize: 14,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
     lineHeight: 20,
   },
@@ -160,6 +166,7 @@ const styles = StyleSheet.create({
   connectButtonText: {
     color: '#fff',
     fontSize: 18,
+    fontFamily: FONTS.bold,
     fontWeight: '700',
   },
   noteContainer: {
@@ -171,6 +178,7 @@ const styles = StyleSheet.create({
   },
   noteText: {
     fontSize: 12,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
     lineHeight: 18,
   },

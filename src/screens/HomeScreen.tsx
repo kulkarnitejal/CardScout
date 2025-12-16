@@ -24,7 +24,7 @@ import { loadTransactions, saveTransactions } from '../services/storageService';
 import { FeaturedRecommendationCard } from '../components/FeaturedRecommendationCard';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { formatCurrency } from '../utils/formatters';
-import { COLORS } from '../utils/constants';
+import { COLORS, FONTS, getFontFamily } from '../utils/constants';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const CARD_WIDTH = SCREEN_WIDTH - 48; // 12px carousel padding + 12px card margin on each side
@@ -123,7 +123,7 @@ export const HomeScreen: React.FC = () => {
       <View style={styles.section}>
         <View style={styles.sectionHeader}>
           <View>
-            <Text style={styles.sectionTitle}>Your Featured Benefits</Text>
+            <Text style={styles.sectionTitle}>Your Current Deals</Text>
             <Text style={styles.sectionSubtitle}>
               {new Date().toLocaleDateString('en-US', { 
                 weekday: 'long', 
@@ -179,7 +179,7 @@ export const HomeScreen: React.FC = () => {
               renderItem={({ item }) => (
                 <FeaturedRecommendationCard
                   recommendation={item}
-                  onPress={() =>
+                  onViewDetails={() =>
                     navigation.navigate('GiftCardDetail', { recommendation: item })
                   }
                 />
@@ -260,12 +260,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
+    fontFamily: FONTS.bold,
     fontWeight: '700',
     color: '#fff',
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 16,
+    fontFamily: FONTS.regular,
     color: '#fff',
     opacity: 0.9,
   },
@@ -288,12 +290,14 @@ const styles = StyleSheet.create({
   },
   statValue: {
     fontSize: 24,
+    fontFamily: FONTS.bold,
     fontWeight: '700',
     color: COLORS.primary,
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
     textAlign: 'center',
   },
@@ -309,12 +313,14 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 24,
+    fontFamily: FONTS.bold,
     fontWeight: '700',
     color: COLORS.text,
     marginBottom: 4,
   },
   sectionSubtitle: {
     fontSize: 14,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
   },
   carouselContent: {
@@ -343,6 +349,7 @@ const styles = StyleSheet.create({
   seeAll: {
     padding: 6,
     fontSize: 16,
+    fontFamily: FONTS.semiBold,
     color: COLORS.primary,
     fontWeight: '600',
   },
@@ -352,6 +359,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 14,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
     textAlign: 'center',
     marginBottom: 16,
@@ -365,6 +373,7 @@ const styles = StyleSheet.create({
   buttonText: {
     color: '#fff',
     fontSize: 16,
+    fontFamily: FONTS.semiBold,
     fontWeight: '600',
   },
   quickActions: {
@@ -388,10 +397,12 @@ const styles = StyleSheet.create({
   actionButtonText: {
     color: '#fff',
     fontSize: 16,
+    fontFamily: FONTS.semiBold,
     fontWeight: '600',
   },
   secondaryButtonText: {
     color: COLORS.primary,
+    fontFamily: FONTS.semiBold,
   },
 });
 

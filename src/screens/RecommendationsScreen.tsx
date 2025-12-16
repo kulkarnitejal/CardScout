@@ -17,7 +17,7 @@ import { CompositeNavigationProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { RootStackParamList, MainTabParamList } from '../navigation/AppNavigator';
-import { COLORS } from '../utils/constants';
+import { COLORS, FONTS } from '../utils/constants';
 
 type RecommendationsScreenNavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<MainTabParamList, 'Benefits'>,
@@ -120,12 +120,14 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
+    fontFamily: FONTS.bold,
     fontWeight: '700',
     color: '#fff',
     marginBottom: 4,
   },
   subtitle: {
     fontSize: 16,
+    fontFamily: FONTS.regular,
     color: '#fff',
     opacity: 0.9,
   },
@@ -143,12 +145,14 @@ const styles = StyleSheet.create({
   },
   summaryLabel: {
     fontSize: 14,
+    fontFamily: FONTS.regular,
     color: '#fff',
     opacity: 0.9,
     marginBottom: 8,
   },
   summaryValue: {
     fontSize: 36,
+    fontFamily: FONTS.bold,
     fontWeight: '700',
     color: '#fff',
   },
@@ -161,6 +165,7 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     fontSize: 18,
+    fontFamily: FONTS.semiBold,
     fontWeight: '600',
     color: COLORS.text,
     marginBottom: 8,
@@ -168,6 +173,7 @@ const styles = StyleSheet.create({
   },
   emptySubtext: {
     fontSize: 14,
+    fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
     textAlign: 'center',
   },
