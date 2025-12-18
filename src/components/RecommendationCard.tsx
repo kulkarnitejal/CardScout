@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Linking } from 'react-native';
 import { Recommendation } from '../types';
 import { formatCurrency, formatPercent } from '../utils/formatters';
 import { COLORS, FONTS } from '../utils/constants';
@@ -9,10 +9,34 @@ interface RecommendationCardProps {
   onPress?: () => void;
 }
 
+// Map gift card sources to their website URLs
+const getSourceUrl = (source: string, merchant: string): string => {
+  const sourceMap: { [key: string]: string } = {
+    'GiftCardMarketplace': 'https://www.giftcardmarketplace.com',
+    'CardCash': 'https://www.cardcash.com',
+    'Raise': 'https://www.raise.com',
+  };
+  
+  const baseUrl = sourceMap[source] || 'https://www.google.com/search?q=' + encodeURIComponent(`${merchant} gift card`);
+  return baseUrl;
+};
+
 export const RecommendationCard: React.FC<RecommendationCardProps> = ({
   recommendation,
   onPress,
 }) => {
+  const handleBuyNow = async () => {
+    const url = getSourceUrl(recommendation.giftCard.source, recommendation.merchant.name);
+    try {
+      const supported = await Linking.canOpenURL(url);
+      if (supported) {
+        await Linking.openURL(url);
+      }
+    } catch (error) {
+      console.error('Error opening URL:', error);
+    }
+  };
+
   const CardContent = (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -56,12 +80,21 @@ export const RecommendationCard: React.FC<RecommendationCardProps> = ({
       </View>
 
       <View style={styles.footer}>
-        <Text style={styles.source}>
-          Available via {recommendation.giftCard.source}
-        </Text>
-        <Text style={styles.availableAmount}>
-          Up to {formatCurrency(recommendation.giftCard.availableAmount)} available
-        </Text>
+        <View style={styles.footerLeft}>
+          <Text style={styles.source}>
+            Available via {recommendation.giftCard.source}
+          </Text>
+          <Text style={styles.availableAmount}>
+            Up to {formatCurrency(recommendation.giftCard.availableAmount)} available
+          </Text>
+        </View>
+        <TouchableOpacity 
+          style={styles.buyNowButton}
+          onPress={handleBuyNow}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.buyNowText}>Buy Now</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -178,15 +211,32 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: COLORS.background,
   },
+  footerLeft: {
+    flex: 1,
+  },
   source: {
     fontSize: 12,
     fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
+    marginBottom: 2,
   },
   availableAmount: {
     fontSize: 12,
     fontFamily: FONTS.semiBold,
     color: COLORS.primary,
+    fontWeight: '600',
+  },
+  buyNowButton: {
+    backgroundColor: COLORS.primary,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginLeft: 12,
+  },
+  buyNowText: {
+    color: '#fff',
+    fontSize: 12,
+    fontFamily: FONTS.semiBold,
     fontWeight: '600',
   },
 });

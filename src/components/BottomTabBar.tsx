@@ -22,11 +22,11 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
 }) => {
   const insets = useSafeAreaInsets();
 
-  const tabs: Tab[] = [
-    { name: 'Home', label: 'Home', icon: '🏠' },
-    { name: 'Benefits', label: 'Benefits', icon: '🎁' },
-    { name: 'ConnectBank', label: 'Connect Bank', icon: '🏦' },
-  ];
+        const tabs: Tab[] = [
+          { name: 'Home', label: 'Home', icon: '🏠' },
+          { name: 'Benefits', label: 'Benefits', icon: '🎁' },
+          { name: 'ConnectBank', label: 'Transactions', icon: '💳' },
+        ];
 
   return (
     <View

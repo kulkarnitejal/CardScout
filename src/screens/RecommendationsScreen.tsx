@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   summaryCard: {
     backgroundColor: COLORS.success,
     margin: 16,
-    padding: 20,
+    padding: 10,
     borderRadius: 12,
     alignItems: 'center',
     shadowColor: '#000',
@@ -151,7 +151,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   summaryValue: {
-    fontSize: 36,
+    fontSize: 30,
     fontFamily: FONTS.bold,
     fontWeight: '700',
     color: '#fff',

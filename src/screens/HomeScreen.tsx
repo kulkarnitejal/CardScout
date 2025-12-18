@@ -179,7 +179,7 @@ export const HomeScreen: React.FC = () => {
               renderItem={({ item }) => (
                 <FeaturedRecommendationCard
                   recommendation={item}
-                  onViewDetails={() =>
+                  onPress={() =>
                     navigation.navigate('GiftCardDetail', { recommendation: item })
                   }
                 />
