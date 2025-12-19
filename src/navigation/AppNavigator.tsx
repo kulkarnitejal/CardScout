@@ -11,21 +11,21 @@ import { BottomTabBar } from '../components/BottomTabBar';
 import { COLORS } from '../utils/constants';
 
 export type RootStackParamList = {
-  MainTabs: { screen?: keyof MainTabParamList } | undefined;
+  Back: { screen?: keyof BackParamList } | undefined;
   Transactions: undefined;
   GiftCardDetail: { recommendation: any };
 };
 
-export type MainTabParamList = {
+export type BackParamList = {
   Home: undefined;
   Benefits: undefined;
   ConnectBank: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
-const Tab = createBottomTabNavigator<MainTabParamList>();
+const Tab = createBottomTabNavigator<BackParamList>();
 
-const MainTabNavigator: React.FC = () => {
+const BackNavigator: React.FC = () => {
   return (
     <Tab.Navigator
       tabBar={(props) => <BottomTabBar {...props} />}
@@ -43,7 +43,7 @@ export const AppNavigator: React.FC = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="MainTabs"
+        initialRouteName="Back"
         screenOptions={{
           headerStyle: {
             backgroundColor: COLORS.primary,
@@ -52,8 +52,8 @@ export const AppNavigator: React.FC = () => {
         }}
       >
         <Stack.Screen
-          name="MainTabs"
-          component={MainTabNavigator}
+          name="Back"
+          component={BackNavigator}
           options={{
             headerShown: false,
           }}

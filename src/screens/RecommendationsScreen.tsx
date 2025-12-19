@@ -16,11 +16,11 @@ import { useNavigation } from '@react-navigation/native';
 import { CompositeNavigationProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
-import { RootStackParamList, MainTabParamList } from '../navigation/AppNavigator';
+import { RootStackParamList, BackParamList } from '../navigation/AppNavigator';
 import { COLORS, FONTS } from '../utils/constants';
 
 type RecommendationsScreenNavigationProp = CompositeNavigationProp<
-  BottomTabNavigationProp<MainTabParamList, 'Benefits'>,
+  BottomTabNavigationProp<BackParamList, 'Benefits'>,
   StackNavigationProp<RootStackParamList>
 >;
 
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: COLORS.primary,
-    padding: 24,
+    padding: 16,
     paddingTop: 60,
   },
   title: {

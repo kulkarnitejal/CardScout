@@ -60,21 +60,24 @@ export const RecommendationCard: React.FC<RecommendationCardProps> = ({
 
       <View style={styles.savingsContainer}>
         <View style={styles.savingsRow}>
+          <Text style={styles.savingsLabel}>Monthly Spending:</Text>
+          <Text style={styles.savingsValue}>
+            {formatCurrency(recommendation.monthlySpending)}
+          </Text>
+        </View>
+ 
+
+      <View style={styles.savingsRow}>
           <Text style={styles.savingsLabel}>Monthly Savings:</Text>
           <Text style={styles.savingsValue}>
             {formatCurrency(recommendation.potentialSavings)}
           </Text>
         </View>
-        <View style={styles.savingsRow}>
-          <Text style={styles.savingsLabel}>Annual Savings:</Text>
+
+      <View style={styles.savingsRow}>
+          <Text style={styles.savingsLabel}>Estimated Annual Savings:</Text>
           <Text style={[styles.savingsValue, styles.annualSavings]}>
             {formatCurrency(recommendation.annualSavings)}
-          </Text>
-        </View>
-        <View style={styles.savingsRow}>
-          <Text style={styles.savingsLabel}>Monthly Spending:</Text>
-          <Text style={styles.savingsValue}>
-            {formatCurrency(recommendation.monthlySpending)}
           </Text>
         </View>
       </View>

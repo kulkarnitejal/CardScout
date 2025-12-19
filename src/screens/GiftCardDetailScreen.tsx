@@ -43,17 +43,19 @@ export const GiftCardDetailScreen: React.FC = () => {
     <ScrollView style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.merchantName}>{recommendation.merchant.name}</Text>
+       
+        <View style={styles.discountBadge}>
+          <Text style={styles.discountText}>
+            {formatPercent(recommendation.savingsPercent)} OFF
+          </Text>
+        </View>
+
         <TouchableOpacity 
             style={styles.actionButton}
             onPress={handleBuyNow}
           >
             <Text style={styles.actionButtonText}>Buy Now</Text>
           </TouchableOpacity>
-        <View style={styles.discountBadge}>
-          <Text style={styles.discountText}>
-            {formatPercent(recommendation.savingsPercent)} OFF
-          </Text>
-        </View>
       </View>
 
       <View style={styles.content}>
@@ -82,7 +84,7 @@ export const GiftCardDetailScreen: React.FC = () => {
           </View>
 
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Annual Savings</Text>
+            <Text style={styles.infoLabel}>Projected Annual Savings</Text>
             <Text style={[styles.infoValue, styles.annualSavings]}>
               {formatCurrency(recommendation.annualSavings)}
             </Text>
@@ -120,6 +122,13 @@ export const GiftCardDetailScreen: React.FC = () => {
               {formatPercent(recommendation.giftCard.discountPercent)}
             </Text>
           </View>
+
+          <TouchableOpacity 
+            style={styles.actionButton}
+            onPress={handleBuyNow}
+          >
+            <Text style={styles.actionButtonText}>Buy Now</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.section}>
@@ -151,12 +160,6 @@ export const GiftCardDetailScreen: React.FC = () => {
             </Text>
           </View>
         </View>
-
-        <View style={styles.noteContainer}>
-          <Text style={styles.noteText}>
-            💡 Tip: Purchase gift cards for merchants you frequent regularly to maximize your savings. The discount applies to the full gift card value.
-          </Text>
-        </View>
       </View>
     </ScrollView>
   );
@@ -168,9 +171,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   header: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: COLORS.background,
     padding: 24,
-    paddingTop: 60,
+    paddingTop: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -179,7 +182,7 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontFamily: FONTS.bold,
     fontWeight: '700',
-    color: '#fff',
+    color: COLORS.text,
     flex: 1,
   },
   discountBadge: {

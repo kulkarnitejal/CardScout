@@ -23,9 +23,8 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
   const insets = useSafeAreaInsets();
 
         const tabs: Tab[] = [
-          { name: 'Home', label: 'Home', icon: '🏠' },
-          { name: 'Benefits', label: 'Benefits', icon: '🎁' },
-          { name: 'ConnectBank', label: 'Transactions', icon: '💳' },
+          { name: 'Deals', label: 'Benefits', icon: ''},
+          { name: 'ConnectBank', label: 'Transactions', icon: '' },
         ];
 
   return (
