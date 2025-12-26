@@ -3,14 +3,14 @@ export const MIN_DISCOUNT_THRESHOLD = 5;
 export const TOP_RECOMMENDATIONS_COUNT = 10;
 
 export const COLORS = {
-  primary: '#172A3A',
-  secondary: '#FFD700',
-  background: '#f5f5f5',
+  primary: '#B4654A',
+  secondary: '#F8F5F1',
+  background: '#EAE0D5',
   surface: '#ffffff',
   error: '#b00020',
   text: '#000000',
   textSecondary: '#757575',
-  success: '#307351',
+  success: '#648767',
   warning: '#ff9800',
 };
 

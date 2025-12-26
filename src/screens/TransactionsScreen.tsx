@@ -7,7 +7,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { Transaction } from '../types';
-import { loadTransactions } from '../services/storageService';
+import { loadTransactions, loadOrGenerateTransactions, regenerateTransactions } from '../services/storageService';
 import { TransactionCard } from '../components/TransactionCard';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { COLORS, FONTS } from '../utils/constants';
@@ -24,7 +24,8 @@ export const TransactionsScreen: React.FC = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const loadedTransactions = await loadTransactions();
+      // Use loadOrGenerateTransactions to ensure we have transactions with current merchants
+      const loadedTransactions = await loadOrGenerateTransactions(100);
       setTransactions(loadedTransactions);
     } catch (error) {
       console.error('Error loading transactions:', error);
@@ -35,8 +36,16 @@ export const TransactionsScreen: React.FC = () => {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await loadData();
-    setRefreshing(false);
+    // Regenerate transactions to get fresh data with current merchants
+    try {
+      const newTransactions = await regenerateTransactions(100);
+      setTransactions(newTransactions);
+    } catch (error) {
+      console.error('Error regenerating transactions:', error);
+      await loadData();
+    } finally {
+      setRefreshing(false);
+    }
   };
 
   if (loading) {

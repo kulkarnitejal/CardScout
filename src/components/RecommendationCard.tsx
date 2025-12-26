@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
   savingsContainer: {
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.secondary,
     borderRadius: 8,
     padding: 12,
     marginBottom: 12,

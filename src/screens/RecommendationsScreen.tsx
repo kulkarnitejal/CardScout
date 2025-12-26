@@ -7,7 +7,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { Transaction, Recommendation } from '../types';
-import { loadTransactions } from '../services/storageService';
+import { loadTransactions, loadOrGenerateTransactions } from '../services/storageService';
 import { analyzeMerchants } from '../services/merchantAnalyzer';
 import { generateRecommendations } from '../services/recommendationEngine';
 import { RecommendationCard } from '../components/RecommendationCard';
@@ -37,7 +37,8 @@ export const RecommendationsScreen: React.FC = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const transactions = await loadTransactions();
+      // Use loadOrGenerateTransactions to ensure we have transactions with current merchants
+      const transactions = await loadOrGenerateTransactions(100);
       const merchants = analyzeMerchants(transactions);
       const recs = generateRecommendations(merchants, transactions);
       setRecommendations(recs);

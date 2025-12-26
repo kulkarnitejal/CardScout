@@ -10,7 +10,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Transaction } from '../types';
-import { loadTransactions } from '../services/storageService';
+import { loadTransactions, loadOrGenerateTransactions, regenerateTransactions } from '../services/storageService';
 import { TransactionCard } from '../components/TransactionCard';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { COLORS, FONTS } from '../utils/constants';
@@ -28,7 +28,8 @@ export const PlaidConnectScreen: React.FC = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const loadedTransactions = await loadTransactions();
+      // Use loadOrGenerateTransactions to ensure we have transactions with current merchants
+      const loadedTransactions = await loadOrGenerateTransactions(100);
       setTransactions(loadedTransactions);
     } catch (error) {
       console.error('Error loading transactions:', error);

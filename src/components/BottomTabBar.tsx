@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS, FONTS } from '../utils/constants';
+//import dollarIcon from '../assets/dollar.png';
 
 interface Tab {
   name: string;
@@ -23,8 +24,8 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
   const insets = useSafeAreaInsets();
 
         const tabs: Tab[] = [
-          { name: 'Deals', label: 'Benefits', icon: ''},
-          { name: 'ConnectBank', label: 'Transactions', icon: '' },
+          { name: 'Deals', label: 'Benefits', icon: 'dollarIcon'},
+          { name: 'ConnectBank', label: 'Transactions', icon: ''},
         ];
 
   return (
@@ -71,7 +72,7 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
             onLongPress={onLongPress}
             style={styles.tab}
           >
-            <Text style={styles.icon}>{tab?.icon || '•'}</Text>
+            <Text style={styles.icon}>{tab?.icon}</Text>
             <Text
               style={[
                 styles.label,
@@ -111,7 +112,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   label: {
-    fontSize: 12,
+    fontSize: 16,
     fontFamily: FONTS.medium,
     color: COLORS.textSecondary,
     fontWeight: '500',
