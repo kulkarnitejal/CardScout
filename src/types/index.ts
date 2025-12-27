@@ -20,6 +20,7 @@ export interface GiftCard {
   merchant: string;
   discountPercent: number;
   availableAmount: number;
+  price: number;
   source: string;
   category?: string;
 }

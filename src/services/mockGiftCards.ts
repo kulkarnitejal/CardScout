@@ -6,7 +6,8 @@ export const mockGiftCards: GiftCard[] = [
     merchant: 'Fogo de Chão',
     discountPercent: 20,
     availableAmount: 100,
-    source: 'Sams Club',
+    price: 80,
+    source: 'Sam\'s Club',
     category: 'Restaurant',
   },
   {
@@ -14,7 +15,8 @@ export const mockGiftCards: GiftCard[] = [
     merchant: 'Southwest Airlines',
     discountPercent: 5,
     availableAmount: 500,
-    source: 'Sams Club',
+    price: 475,
+    source: 'Sam\'s Club',
     category: 'Travel',
   },
   {
@@ -22,7 +24,8 @@ export const mockGiftCards: GiftCard[] = [
     merchant: 'Southwest Airlines',
     discountPercent: 5,
     availableAmount: 250,
-    source: 'Sams Club',
+    price: 237.5,
+    source: 'Sam\'s Club',
     category: 'Travel',
   },
   {
@@ -30,7 +33,8 @@ export const mockGiftCards: GiftCard[] = [
     merchant: 'Saltgrass Steakhouse',
     discountPercent: 20,
     availableAmount: 100,
-    source: 'Sams Club',
+    price: 80,
+    source: 'Sam\'s Club',
     category: 'Restaurant',
   },
   {
@@ -38,7 +42,8 @@ export const mockGiftCards: GiftCard[] = [
     merchant: 'Bubba Gump Shrimp Co.',
     discountPercent: 20,
     availableAmount: 100,
-    source: 'Sams Club',
+    price: 80,
+    source: 'Sam\'s Club',
     category: 'Restaurant',
   },
   {
@@ -46,7 +51,8 @@ export const mockGiftCards: GiftCard[] = [
     merchant: 'Xbox',
     discountPercent: 10,
     availableAmount: 100,
-    source: 'Sams Club',
+    price: 90,
+    source: 'Sam\'s Club',
     category: 'Entertainment',
   },
   {
@@ -54,7 +60,8 @@ export const mockGiftCards: GiftCard[] = [
     merchant: 'Wendys',
     discountPercent: 20,
     availableAmount: 60,
-    source: 'Sams Club',
+    price: 48,
+    source: 'Sam\'s Club',
     category: 'Restaurant',
   },
   {
@@ -62,7 +69,8 @@ export const mockGiftCards: GiftCard[] = [
     merchant: 'Coldstone Creamery',
     discountPercent: 33,
     availableAmount: 30,
-    source: 'Sams Club',
+    price: 20,
+    source: 'Sam\'s Club',
     category: 'Restaurant',
   },
   {
@@ -70,7 +78,8 @@ export const mockGiftCards: GiftCard[] = [
     merchant: 'Top Golf',
     discountPercent: 20,
     availableAmount: 75,
-    source: 'Sams Club',
+    price: 60,
+    source: 'Sam\'s Club',
     category: 'Entertainment',
   },
   {
@@ -78,7 +87,8 @@ export const mockGiftCards: GiftCard[] = [
     merchant: 'Cinemark',
     discountPercent: 20,
     availableAmount: 50,
-    source: 'Sams Club',
+    price: 40,
+    source: 'Sam\'s Club',
     category: 'Entertainment',
   },
   {
@@ -86,14 +96,16 @@ export const mockGiftCards: GiftCard[] = [
     merchant: 'PetSmart',
     discountPercent: 10,
     availableAmount: 100,
-    source: 'Sams Club',
+    price: 90,
+    source: 'Sam\'s Club',
     category: 'Grocery',
   },{
     id: 'gc_redlobster_samsclub',
     merchant: 'Red Lobster',
     discountPercent: 20,
     availableAmount: 100,
-    source: 'Sams Club',
+    price: 80,
+    source: 'Sam\'s Club',
     category: 'Restaurant',
   },
   {
@@ -101,7 +113,8 @@ export const mockGiftCards: GiftCard[] = [
     merchant: 'Potbelly',
     discountPercent: 25,
     availableAmount: 50,
-    source: 'Sams Club',
+    price: 40,
+    source: 'Sam\'s Club',
     category: 'Restaurant',
   },
   {
@@ -109,7 +122,8 @@ export const mockGiftCards: GiftCard[] = [
     merchant: 'P.F. Chang\'s',
     discountPercent: 20,
     availableAmount: 50,
-    source: 'Sams Club',
+    price: 40,
+    source: 'Sam\'s Club',
     category: 'Restaurant',
   },
   {
@@ -117,7 +131,8 @@ export const mockGiftCards: GiftCard[] = [
     merchant: 'Quince',
     discountPercent: 20,
     availableAmount: 50,
-    source: 'Sams Club',
+    price: 40,
+    source: 'Sam\'s Club',
     category: 'Retail',
   },
   {
@@ -125,7 +140,8 @@ export const mockGiftCards: GiftCard[] = [
     merchant: 'AMC Theatres',
     discountPercent: 40,
     availableAmount: 50,
-    source: 'Sams Club',
+    price: 40,
+    source: 'Sam\'s Club',
     category: 'Entertainment',
   },
 ];

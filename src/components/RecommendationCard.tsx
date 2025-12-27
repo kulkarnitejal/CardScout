@@ -12,10 +12,8 @@ interface RecommendationCardProps {
 // Map gift card sources to their website URLs
 const getSourceUrl = (source: string, merchant: string): string => {
   const sourceMap: { [key: string]: string } = {
-    'GiftCardMarketplace': 'https://www.giftcardmarketplace.com',
-    'CardCash': 'https://www.cardcash.com',
-    'Raise': 'https://www.raise.com',
-  };
+    'Sam\'s Club': 'https://www.samsclub.com/browse/Gift-Cards/1003'
+  }
   
   const baseUrl = sourceMap[source] || 'https://www.google.com/search?q=' + encodeURIComponent(`${merchant} gift card`);
   return baseUrl;
@@ -60,24 +58,22 @@ export const RecommendationCard: React.FC<RecommendationCardProps> = ({
 
       <View style={styles.savingsContainer}>
         <View style={styles.savingsRow}>
-          <Text style={styles.savingsLabel}>Monthly Spending:</Text>
-          <Text style={styles.savingsValue}>
-            {formatCurrency(recommendation.monthlySpending)}
-          </Text>
-        </View>
- 
-
-      <View style={styles.savingsRow}>
-          <Text style={styles.savingsLabel}>Monthly Savings:</Text>
-          <Text style={styles.savingsValue}>
-            {formatCurrency(recommendation.potentialSavings)}
-          </Text>
+          <Text style={styles.savingsLabel}>Monthly Spending</Text>
+          <Text style={styles.savingsValue}>{formatCurrency(recommendation.monthlySpending)}</Text>
         </View>
 
-      <View style={styles.savingsRow}>
-          <Text style={styles.savingsLabel}>Estimated Annual Savings:</Text>
+        <View style={styles.savingsRow}>
+          <Text style={styles.savingsLabel}>Gift Card</Text>
+          <View style={styles.giftCardValue}>
+            <Text style={styles.giftCardAmount}>{formatCurrency(recommendation.giftCard.availableAmount)}</Text>
+            <Text style={styles.giftCardPrice}>Pay {formatCurrency(recommendation.giftCard.price)}</Text>
+          </View>
+        </View>
+
+        <View style={[styles.savingsRow, styles.savingsRowLast]}>
+          <Text style={styles.savingsLabel}>Monthly Savings</Text>
           <Text style={[styles.savingsValue, styles.annualSavings]}>
-            {formatCurrency(recommendation.annualSavings)}
+            {formatCurrency(recommendation.potentialSavings)}
           </Text>
         </View>
       </View>
@@ -187,18 +183,42 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 10,
+    paddingBottom: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0, 0, 0, 0.05)',
+  },
+  savingsRowLast: {
+    marginBottom: 0,
+    paddingBottom: 0,
+    borderBottomWidth: 0,
   },
   savingsLabel: {
-    fontSize: 14,
-    fontFamily: FONTS.regular,
+    fontSize: 13,
+    fontFamily: FONTS.medium,
     color: COLORS.textSecondary,
+    fontWeight: '500',
   },
   savingsValue: {
     fontSize: 16,
     fontFamily: FONTS.semiBold,
     fontWeight: '600',
     color: COLORS.text,
+  },
+  giftCardValue: {
+    alignItems: 'flex-end',
+  },
+  giftCardAmount: {
+    fontSize: 16,
+    fontFamily: FONTS.semiBold,
+    fontWeight: '600',
+    color: COLORS.text,
+    marginBottom: 2,
+  },
+  giftCardPrice: {
+    fontSize: 12,
+    fontFamily: FONTS.regular,
+    color: COLORS.textSecondary,
   },
   annualSavings: {
     fontSize: 18,
