@@ -1,8 +1,6 @@
-// Plaid service - stubbed for future integration
-// In production, this would handle:
-// 1. Generating link tokens (requires backend)
-// 2. Exchanging public tokens for access tokens (requires backend)
-// 3. Fetching transactions from Plaid API
+import axios from 'axios';
+import { API_BASE_URL } from '../utils/constants';
+import { savePlaidAccessToken } from './storageService';
 
 export interface PlaidConfig {
   clientId: string;
@@ -10,40 +8,130 @@ export interface PlaidConfig {
   environment: 'sandbox' | 'development' | 'production';
 }
 
-export const initializePlaid = (config: PlaidConfig): void => {
-  // TODO: Initialize Plaid client
-  console.log('Plaid initialization (stubbed)', config);
+/**
+ * Generate a Plaid Link token from the backend
+ */
+export const generateLinkToken = async (userId?: string): Promise<string> => {
+  try {
+    const url = `${API_BASE_URL}/plaid/create-link-token`;
+    console.log('🌐 Requesting link token from:', url);
+    
+    const response = await axios.post(url, {
+      userId: userId || 'default-user-id',
+    }, {
+      timeout: 10000, // 10 second timeout
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.data.success && response.data.link_token) {
+      console.log('✅ Link token received successfully');
+      return response.data.link_token;
+    }
+
+    throw new Error(response.data.error || 'Failed to generate link token');
+  } catch (error: any) {
+    console.error('❌ Error generating link token:', error);
+    console.error('📡 API URL was:', `${API_BASE_URL}/plaid/create-link-token`);
+    
+    if (error.code === 'ECONNABORTED') {
+      throw new Error('Request timeout - check if backend server is running');
+    }
+    
+    if (error.code === 'ENOTFOUND' || error.code === 'ECONNREFUSED') {
+      throw new Error(`Cannot connect to backend at ${API_BASE_URL}. Make sure the server is running and the URL is correct for your platform.`);
+    }
+    
+    if (error.response) {
+      throw new Error(error.response.data?.error || 'Failed to generate link token');
+    }
+    
+    throw new Error(error.message || 'Failed to generate link token');
+  }
 };
 
-export const generateLinkToken = async (): Promise<string> => {
-  // TODO: Call backend API to generate link token
-  // This requires a backend server as Plaid Link tokens must be generated server-side
-  throw new Error('Plaid Link token generation requires backend server');
+/**
+ * Exchange public token for access token via backend
+ */
+export const exchangePublicToken = async (publicToken: string): Promise<{ accessToken: string; itemId: string }> => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/plaid/exchange-token`, {
+      public_token: publicToken,
+    });
+
+    if (response.data.success && response.data.access_token && response.data.item_id) {
+      // Store the access token securely
+      await savePlaidAccessToken(response.data.access_token, response.data.item_id);
+      
+      return {
+        accessToken: response.data.access_token,
+        itemId: response.data.item_id,
+      };
+    }
+
+    throw new Error(response.data.error || 'Failed to exchange token');
+  } catch (error: any) {
+    console.error('Error exchanging public token:', error);
+    if (error.response) {
+      throw new Error(error.response.data?.error || 'Failed to exchange token');
+    }
+    throw new Error(error.message || 'Failed to exchange token');
+  }
 };
 
-export const exchangePublicToken = async (publicToken: string): Promise<string> => {
-  // TODO: Call backend API to exchange public token for access token
-  // This requires a backend server
-  throw new Error('Plaid token exchange requires backend server');
-};
-
+/**
+ * Fetch transactions from Plaid via backend
+ */
 export const fetchTransactions = async (
   accessToken: string,
   startDate: Date,
   endDate: Date
 ): Promise<any[]> => {
-  // TODO: Call backend API to fetch transactions
-  // Backend would call Plaid API: /transactions/get
-  throw new Error('Plaid transaction fetching requires backend server');
+  try {
+    // Format dates as YYYY-MM-DD
+    const startDateStr = startDate.toISOString().split('T')[0];
+    const endDateStr = endDate.toISOString().split('T')[0];
+
+    const response = await axios.post(`${API_BASE_URL}/plaid/transactions`, {
+      access_token: accessToken,
+      start_date: startDateStr,
+      end_date: endDateStr,
+    });
+
+    if (response.data.success && Array.isArray(response.data.transactions)) {
+      return response.data.transactions;
+    }
+
+    throw new Error(response.data.error || 'Failed to fetch transactions');
+  } catch (error: any) {
+    console.error('Error fetching transactions:', error);
+    if (error.response) {
+      throw new Error(error.response.data?.error || 'Failed to fetch transactions');
+    }
+    throw new Error(error.message || 'Failed to fetch transactions');
+  }
 };
 
-// Note: For production implementation:
-// 1. Set up a backend server (Node.js/Express recommended)
-// 2. Install Plaid Node SDK on backend
-// 3. Create API endpoints:
-//    - POST /api/plaid/create-link-token
-//    - POST /api/plaid/exchange-token
-//    - POST /api/plaid/transactions
-// 4. Update this service to call these endpoints
-// 5. Implement react-native-plaid-link-sdk in PlaidConnectScreen
+/**
+ * Get accounts from Plaid via backend
+ */
+export const fetchAccounts = async (accessToken: string): Promise<any[]> => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/plaid/accounts`, {
+      access_token: accessToken,
+    });
 
+    if (response.data.success && Array.isArray(response.data.accounts)) {
+      return response.data.accounts;
+    }
+
+    throw new Error(response.data.error || 'Failed to fetch accounts');
+  } catch (error: any) {
+    console.error('Error fetching accounts:', error);
+    if (error.response) {
+      throw new Error(error.response.data?.error || 'Failed to fetch accounts');
+    }
+    throw new Error(error.message || 'Failed to fetch accounts');
+  }
+};

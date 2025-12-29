@@ -4,6 +4,8 @@ import { generateMockTransactions } from './mockTransactions';
 import { getAllGiftCards } from './mockGiftCards';
 
 const TRANSACTIONS_KEY = '@giftcardmaxing:transactions';
+const PLAID_ACCESS_TOKEN_KEY = '@giftcardmaxing:plaid_access_token';
+const PLAID_ITEM_ID_KEY = '@giftcardmaxing:plaid_item_id';
 
 export const saveTransactions = async (transactions: Transaction[]): Promise<void> => {
   try {
@@ -116,5 +118,40 @@ export const loadOrGenerateTransactions = async (count: number = 100): Promise<T
       return [];
     }
   }
+};
+
+// Plaid token storage
+export const savePlaidAccessToken = async (accessToken: string, itemId: string): Promise<void> => {
+  try {
+    await AsyncStorage.setItem(PLAID_ACCESS_TOKEN_KEY, accessToken);
+    await AsyncStorage.setItem(PLAID_ITEM_ID_KEY, itemId);
+  } catch (error) {
+    console.error('Error saving Plaid access token:', error);
+    throw error;
+  }
+};
+
+export const getPlaidAccessToken = async (): Promise<string | null> => {
+  try {
+    return await AsyncStorage.getItem(PLAID_ACCESS_TOKEN_KEY);
+  } catch (error) {
+    console.error('Error getting Plaid access token:', error);
+    return null;
+  }
+};
+
+export const clearPlaidTokens = async (): Promise<void> => {
+  try {
+    await AsyncStorage.removeItem(PLAID_ACCESS_TOKEN_KEY);
+    await AsyncStorage.removeItem(PLAID_ITEM_ID_KEY);
+  } catch (error) {
+    console.error('Error clearing Plaid tokens:', error);
+    throw error;
+  }
+};
+
+export const hasPlaidAccessToken = async (): Promise<boolean> => {
+  const token = await getPlaidAccessToken();
+  return token !== null;
 };
 

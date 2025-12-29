@@ -8,33 +8,88 @@ import {
   FlatList,
   RefreshControl,
   ScrollView,
+  Platform,
 } from 'react-native';
+import { create, open, destroy, LinkSuccess, LinkExit, LinkTokenConfiguration } from 'react-native-plaid-link-sdk';
 import { Transaction } from '../types';
-import { loadTransactions, loadOrGenerateTransactions, regenerateTransactions } from '../services/storageService';
+import { 
+  loadTransactions, 
+  loadOrGenerateTransactions, 
+  regenerateTransactions,
+  getPlaidAccessToken,
+  savePlaidAccessToken,
+  hasPlaidAccessToken,
+} from '../services/storageService';
 import { TransactionCard } from '../components/TransactionCard';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { COLORS, FONTS } from '../utils/constants';
+import { generateLinkToken, exchangePublicToken, fetchTransactions } from '../services/plaidService';
 
 export const PlaidConnectScreen: React.FC = () => {
   const [connecting, setConnecting] = useState(false);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [hasConnected, setHasConnected] = useState(false);
 
   useEffect(() => {
+    checkConnectionStatus();
     loadData();
   }, []);
+
+  const checkConnectionStatus = async () => {
+    const connected = await hasPlaidAccessToken();
+    setHasConnected(connected);
+  };
 
   const loadData = async () => {
     try {
       setLoading(true);
-      // Use loadOrGenerateTransactions to ensure we have transactions with current merchants
-      const loadedTransactions = await loadOrGenerateTransactions(100);
-      setTransactions(loadedTransactions);
+      
+      // Check if we have a Plaid access token
+      const accessToken = await getPlaidAccessToken();
+      
+      if (accessToken) {
+        // Fetch real transactions from Plaid
+        await loadPlaidTransactions(accessToken);
+      } else {
+        // Use mock transactions if no Plaid connection
+        const loadedTransactions = await loadOrGenerateTransactions(100);
+        setTransactions(loadedTransactions);
+      }
     } catch (error) {
       console.error('Error loading transactions:', error);
+      // Fallback to mock data on error
+      const loadedTransactions = await loadOrGenerateTransactions(100);
+      setTransactions(loadedTransactions);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadPlaidTransactions = async (accessToken: string) => {
+    try {
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - 90); // Last 90 days
+
+      const plaidTransactions = await fetchTransactions(accessToken, startDate, endDate);
+      
+      // Convert Plaid transactions to our Transaction format
+      const formattedTransactions: Transaction[] = plaidTransactions.map((txn: any) => ({
+        id: txn.transaction_id,
+        date: new Date(txn.date),
+        merchant: txn.merchant_name || txn.name || 'Unknown',
+        amount: Math.abs(txn.amount),
+        category: txn.category?.[0] || txn.personal_finance_category?.primary || 'Other',
+      }));
+
+      setTransactions(formattedTransactions);
+      // Save to local storage
+      await regenerateTransactions(formattedTransactions.length);
+    } catch (error) {
+      console.error('Error loading Plaid transactions:', error);
+      throw error;
     }
   };
 
@@ -45,25 +100,85 @@ export const PlaidConnectScreen: React.FC = () => {
   };
 
   const handleConnect = async () => {
-    setConnecting(true);
-    
-    // TODO: Implement Plaid Link integration
-    // This requires:
-    // 1. Backend server to generate link tokens
-    // 2. react-native-plaid-link-sdk implementation
-    // 3. Token exchange and transaction fetching
-    
-    setTimeout(() => {
+    try {
+      setConnecting(true);
+      
+      // Generate link token from backend
+      const token = await generateLinkToken();
+      
+      // Create Plaid Link session
+      const tokenConfig: LinkTokenConfiguration = {
+        token: token,
+        noLoadingState: false,
+        onLoad: () => {
+          console.log('Plaid Link loaded');
+          setConnecting(false);
+        },
+      };
+      
+      create(tokenConfig);
+      
+      // Open Plaid Link
+      open({
+        onSuccess: handlePlaidSuccess,
+        onExit: handlePlaidExit,
+      });
+    } catch (error: any) {
       setConnecting(false);
       Alert.alert(
-        'Coming Soon',
-        'Plaid integration requires a backend server. For now, the app uses mock transaction data. Check the documentation for backend setup instructions.',
+        'Connection Error',
+        error.message || 'Failed to initialize bank connection. Please check your backend server is running.',
         [{ text: 'OK' }]
       );
-    }, 1000);
+    }
   };
 
-  const hasConnectedAccounts = transactions.length > 0;
+  const handlePlaidSuccess = async (success: LinkSuccess) => {
+    try {
+      setConnecting(true);
+      
+      // Exchange public token for access token
+      const { accessToken, itemId } = await exchangePublicToken(success.publicToken);
+      
+      // Save access token
+      await savePlaidAccessToken(accessToken, itemId);
+      setHasConnected(true);
+      
+      // Clean up Plaid session
+      await destroy();
+      
+      // Load transactions from Plaid
+      await loadPlaidTransactions(accessToken);
+      
+      Alert.alert(
+        'Success!',
+        'Your bank account has been connected successfully.',
+        [{ text: 'OK' }]
+      );
+    } catch (error: any) {
+      Alert.alert(
+        'Error',
+        error.message || 'Failed to connect bank account. Please try again.',
+        [{ text: 'OK' }]
+      );
+    } finally {
+      setConnecting(false);
+    }
+  };
+
+  const handlePlaidExit = (exit: LinkExit | null) => {
+    setConnecting(false);
+    
+    if (exit?.error) {
+      Alert.alert(
+        'Connection Cancelled',
+        exit.error.displayMessage || 'Bank connection was cancelled.',
+        [{ text: 'OK' }]
+      );
+    }
+  };
+
+  const hasConnectedAccounts = hasConnected || transactions.length > 0;
 
   if (loading) {
     return <LoadingSpinner />;

@@ -12,7 +12,7 @@ router.get('/health', (req, res) => {
   });
 });
 
-// API routes
+// Plaid routes
 router.use('/plaid', plaidRoutes);
 
 export default router;
