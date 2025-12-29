@@ -39,7 +39,13 @@ const getBackendUrl = (): string => {
 // Uncomment the line below and use your computer's IP if testing on a physical device:
 // export const API_BASE_URL = 'http://192.168.1.205:3000/api';
 
-export const API_BASE_URL = getBackendUrl();
+// For quick testing on physical devices, you can override here:
+// Your computer's IP is: 192.168.1.205
+// 
+// IMPORTANT: For iOS physical devices, you MUST use your computer's IP address
+// Uncomment the line below for physical device testing:
+export const API_BASE_URL = 'http://192.168.1.205:3000/api'; // For iOS physical device
+// export const API_BASE_URL = getBackendUrl(); // Use this for simulators/emulators
 
 // Log the API URL being used (for debugging)
 if (__DEV__) {

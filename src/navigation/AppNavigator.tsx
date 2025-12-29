@@ -2,15 +2,21 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-//import { HomeScreen } from '../screens/HomeScreen';
 import { TransactionsScreen } from '../screens/TransactionsScreen';
 import { RecommendationsScreen } from '../screens/RecommendationsScreen';
 import { GiftCardDetailScreen } from '../screens/GiftCardDetailScreen';
 import { PlaidConnectScreen } from '../screens/PlaidConnectScreen';
+import { LoginScreen } from '../screens/LoginScreen';
+import { SignupScreen } from '../screens/SignupScreen';
 import { BottomTabBar } from '../components/BottomTabBar';
 import { COLORS } from '../utils/constants';
+import { useAuth } from '../contexts/AuthContext';
+import { LoadingSpinner } from '../components/LoadingSpinner';
 
 export type RootStackParamList = {
+  Auth: undefined;
+  Login: undefined;
+  Signup: undefined;
   Back: { screen?: keyof BackParamList } | undefined;
   Transactions: undefined;
   GiftCardDetail: { recommendation: any };
@@ -39,11 +45,46 @@ const BackNavigator: React.FC = () => {
   );
 };
 
+const AuthStack = createStackNavigator();
+
+const AuthNavigator: React.FC = () => {
+  return (
+    <AuthStack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: COLORS.primary,
+        },
+        headerTintColor: '#fff',
+      }}
+    >
+      <AuthStack.Screen
+        name="Login"
+        component={LoginScreen}
+        options={{
+          title: 'Sign In',
+        }}
+      />
+      <AuthStack.Screen
+        name="Signup"
+        component={SignupScreen}
+        options={{
+          title: 'Sign Up',
+        }}
+      />
+    </AuthStack.Navigator>
+  );
+};
+
 export const AppNavigator: React.FC = () => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
+
   return (
     <NavigationContainer>
       <Stack.Navigator
-        initialRouteName="Back"
         screenOptions={{
           headerStyle: {
             backgroundColor: COLORS.primary,
@@ -51,27 +92,41 @@ export const AppNavigator: React.FC = () => {
           headerTintColor: '#fff',
         }}
       >
-        <Stack.Screen
-          name="Back"
-          component={BackNavigator}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="Transactions"
-          component={TransactionsScreen}
-          options={{
-            headerShown: false,
-          }}
-        />
-        <Stack.Screen
-          name="GiftCardDetail"
-          component={GiftCardDetailScreen}
-          options={{
-            title: 'Gift Card Details',
-          }}
-        />
+        {user ? (
+          // User is logged in - show main app
+          <>
+            <Stack.Screen
+              name="Back"
+              component={BackNavigator}
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="Transactions"
+              component={TransactionsScreen}
+              options={{
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="GiftCardDetail"
+              component={GiftCardDetailScreen}
+              options={{
+                title: 'Gift Card Details',
+              }}
+            />
+          </>
+        ) : (
+          // User is not logged in - show auth screens
+          <Stack.Screen
+            name="Auth"
+            component={AuthNavigator}
+            options={{
+              headerShown: false,
+            }}
+          />
+        )}
       </Stack.Navigator>
     </NavigationContainer>
   );

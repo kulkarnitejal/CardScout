@@ -13,17 +13,13 @@ import {
 import { create, open, destroy, LinkSuccess, LinkExit, LinkTokenConfiguration } from 'react-native-plaid-link-sdk';
 import { Transaction } from '../types';
 import { 
-  loadTransactions, 
-  loadOrGenerateTransactions, 
-  regenerateTransactions,
-  getPlaidAccessToken,
-  savePlaidAccessToken,
-  hasPlaidAccessToken,
+  loadOrGenerateTransactions,
 } from '../services/storageService';
 import { TransactionCard } from '../components/TransactionCard';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { COLORS, FONTS } from '../utils/constants';
-import { generateLinkToken, exchangePublicToken, fetchTransactions } from '../services/plaidService';
+import { generateLinkToken, exchangePublicToken, fetchTransactions, fetchAccounts } from '../services/plaidService';
+import { getPlaidItems, getTransactions, getCurrentUser } from '../services/supabaseService';
 
 export const PlaidConnectScreen: React.FC = () => {
   const [connecting, setConnecting] = useState(false);
@@ -38,20 +34,40 @@ export const PlaidConnectScreen: React.FC = () => {
   }, []);
 
   const checkConnectionStatus = async () => {
-    const connected = await hasPlaidAccessToken();
-    setHasConnected(connected);
+    try {
+      const user = await getCurrentUser();
+      if (!user) {
+        setHasConnected(false);
+        return;
+      }
+
+      const { data: plaidItems } = await getPlaidItems(user.id);
+      setHasConnected(!!(plaidItems && plaidItems.length > 0));
+    } catch (error) {
+      console.error('Error checking connection status:', error);
+      setHasConnected(false);
+    }
   };
 
   const loadData = async () => {
     try {
       setLoading(true);
       
-      // Check if we have a Plaid access token
-      const accessToken = await getPlaidAccessToken();
+      // Get current user
+      const user = await getCurrentUser();
+      if (!user) {
+        // No user logged in, use mock data
+        const loadedTransactions = await loadOrGenerateTransactions(100);
+        setTransactions(loadedTransactions);
+        return;
+      }
+
+      // Check if user has connected Plaid items
+      const { data: plaidItems } = await getPlaidItems(user.id);
       
-      if (accessToken) {
-        // Fetch real transactions from Plaid
-        await loadPlaidTransactions(accessToken);
+      if (plaidItems && plaidItems.length > 0) {
+        // Load transactions from Supabase
+        await loadTransactionsFromSupabase(user.id);
       } else {
         // Use mock transactions if no Plaid connection
         const loadedTransactions = await loadOrGenerateTransactions(100);
@@ -67,13 +83,56 @@ export const PlaidConnectScreen: React.FC = () => {
     }
   };
 
-  const loadPlaidTransactions = async (accessToken: string) => {
+  const loadTransactionsFromSupabase = async (userId: string) => {
+    try {
+      // Get transactions from Supabase (last 90 days)
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - 90);
+
+      const { data: supabaseTransactions, error } = await getTransactions(userId, {
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0],
+        limit: 500, // Limit to recent transactions
+      });
+
+      if (error) {
+        console.error('Error loading transactions from Supabase:', error);
+        throw error;
+      }
+
+      if (supabaseTransactions && supabaseTransactions.length > 0) {
+        // Convert Supabase transactions to our Transaction format
+        const formattedTransactions: Transaction[] = supabaseTransactions.map((txn: any) => ({
+          id: txn.transaction_id,
+          date: new Date(txn.date),
+          merchant: txn.merchant_name || txn.name || 'Unknown',
+          amount: Math.abs(txn.amount),
+          category: txn.category || txn.personal_finance_category?.primary || 'Other',
+        }));
+
+        setTransactions(formattedTransactions);
+      } else {
+        // No transactions in Supabase yet, use mock data
+        const loadedTransactions = await loadOrGenerateTransactions(100);
+        setTransactions(loadedTransactions);
+      }
+    } catch (error) {
+      console.error('Error loading transactions from Supabase:', error);
+      // Fallback to mock data
+      const loadedTransactions = await loadOrGenerateTransactions(100);
+      setTransactions(loadedTransactions);
+    }
+  };
+
+  const loadPlaidTransactions = async (accessToken: string, plaidItemId: string) => {
     try {
       const endDate = new Date();
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - 90); // Last 90 days
 
-      const plaidTransactions = await fetchTransactions(accessToken, startDate, endDate);
+      // Fetch transactions from Plaid and sync to Supabase
+      const plaidTransactions = await fetchTransactions(accessToken, plaidItemId, startDate, endDate, true);
       
       // Convert Plaid transactions to our Transaction format
       const formattedTransactions: Transaction[] = plaidTransactions.map((txn: any) => ({
@@ -85,8 +144,6 @@ export const PlaidConnectScreen: React.FC = () => {
       }));
 
       setTransactions(formattedTransactions);
-      // Save to local storage
-      await regenerateTransactions(formattedTransactions.length);
     } catch (error) {
       console.error('Error loading Plaid transactions:', error);
       throw error;
@@ -104,26 +161,57 @@ export const PlaidConnectScreen: React.FC = () => {
       setConnecting(true);
       
       // Generate link token from backend
+      console.log('🔄 Generating link token...');
       const token = await generateLinkToken();
+      console.log('✅ Link token received:', token.substring(0, 20) + '...');
       
       // Create Plaid Link session
       const tokenConfig: LinkTokenConfiguration = {
         token: token,
         noLoadingState: false,
         onLoad: () => {
-          console.log('Plaid Link loaded');
-          setConnecting(false);
+          console.log('✅ Plaid Link onLoad callback fired');
         },
       };
       
+      console.log('🔧 Creating Plaid Link session...');
       create(tokenConfig);
       
-      // Open Plaid Link
-      open({
-        onSuccess: handlePlaidSuccess,
-        onExit: handlePlaidExit,
-      });
+      // Open Plaid Link after a short delay to ensure create() completes
+      // According to Plaid docs, maximizing delay reduces latency
+      console.log('🚀 Scheduling Plaid Link open...');
+      setTimeout(() => {
+        console.log('🚀 Opening Plaid Link now...');
+        try {
+          const openProps = {
+            onSuccess: (success: LinkSuccess) => {
+              console.log('✅ Plaid Link onSuccess called');
+              handlePlaidSuccess(success);
+            },
+            onExit: (exit: LinkExit | null) => {
+              console.log('🔚 Plaid Link onExit called');
+              handlePlaidExit(exit);
+            },
+          };
+          
+          console.log('📞 Calling open() function...');
+          open(openProps);
+          console.log('✅ open() function called successfully');
+        } catch (openError: any) {
+          console.error('❌ Exception thrown when calling open():', openError);
+          console.error('Error stack:', openError.stack);
+          setConnecting(false);
+          Alert.alert(
+            'Error',
+            openError.message || 'Failed to open Plaid Link. Please try again.',
+            [{ text: 'OK' }]
+          );
+        }
+      }, 500); // Increased delay to ensure create() initializes properly
+      
     } catch (error: any) {
+      console.error('❌ Error in handleConnect:', error);
+      console.error('Error details:', JSON.stringify(error, null, 2));
       setConnecting(false);
       Alert.alert(
         'Connection Error',
@@ -137,18 +225,33 @@ export const PlaidConnectScreen: React.FC = () => {
     try {
       setConnecting(true);
       
-      // Exchange public token for access token
-      const { accessToken, itemId } = await exchangePublicToken(success.publicToken);
+      // Get institution info from Plaid metadata if available
+      const institutionName = success.metadata?.institution?.name;
+      const institutionId = success.metadata?.institution?.id;
       
-      // Save access token
-      await savePlaidAccessToken(accessToken, itemId);
+      // Exchange public token for access token and save to Supabase
+      const { accessToken, itemId, plaidItemId } = await exchangePublicToken(
+        success.publicToken,
+        institutionName,
+        institutionId
+      );
+      
       setHasConnected(true);
       
       // Clean up Plaid session
       await destroy();
       
-      // Load transactions from Plaid
-      await loadPlaidTransactions(accessToken);
+      // Fetch and sync accounts to Supabase
+      try {
+        await fetchAccounts(accessToken, plaidItemId, true);
+        console.log('✅ Accounts synced to Supabase');
+      } catch (accountError) {
+        console.error('Error syncing accounts:', accountError);
+        // Continue even if account sync fails
+      }
+      
+      // Load transactions from Plaid and sync to Supabase
+      await loadPlaidTransactions(accessToken, plaidItemId);
       
       Alert.alert(
         'Success!',
