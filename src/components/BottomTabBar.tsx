@@ -2,12 +2,13 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS, FONTS } from '../utils/constants';
-//import dollarIcon from '../assets/dollar.png';
+// @ts-ignore - @expo/vector-icons is available in Expo
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 interface Tab {
   name: string;
   label: string;
-  icon: string;
+  iconName: keyof typeof MaterialCommunityIcons.glyphMap;
 }
 
 interface BottomTabBarProps {
@@ -24,8 +25,8 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
   const insets = useSafeAreaInsets();
 
         const tabs: Tab[] = [
-          { name: 'Deals', label: 'Benefits', icon: 'dollarIcon'},
-          { name: 'ConnectBank', label: 'Transactions', icon: ''},
+          { name: 'Benefits', label: 'Benefits', iconName: 'gift-outline' },
+          { name: 'ConnectBank', label: 'Transactions', iconName: 'wallet-outline' },
         ];
 
   return (
@@ -72,7 +73,12 @@ export const BottomTabBar: React.FC<BottomTabBarProps> = ({
             onLongPress={onLongPress}
             style={styles.tab}
           >
-            <Text style={styles.icon}>{tab?.icon}</Text>
+            <MaterialCommunityIcons
+              name={tab?.iconName || 'circle'}
+              size={24}
+              color={isFocused ? COLORS.primary : COLORS.textSecondary}
+              style={styles.icon}
+            />
             <Text
               style={[
                 styles.label,
@@ -108,7 +114,6 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   icon: {
-    fontSize: 24,
     marginBottom: 4,
   },
   label: {
