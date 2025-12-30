@@ -109,7 +109,7 @@ export const RecommendationsScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>All Current Deals</Text>
+        <Text style={styles.title}>Deals for you</Text>
       </View>
 
       {recommendations.length > 0 && (

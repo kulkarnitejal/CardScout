@@ -119,14 +119,14 @@ export const RecommendationCard: React.FC<RecommendationCardProps> = ({
       </View>
 
       <View style={styles.quarterlySpendingContainer}>
-        <Text style={styles.quarterlySpendingLabel}>Avg. Quarterly Spend</Text>
+        <Text style={styles.quarterlySpendingLabel}>Your avg. Quarterly Spend</Text>
         <Text style={styles.quarterlySpendingValue}>
           {formatCurrency(quarterlySpending)}
         </Text>
       </View>
 
       <View style={styles.giftCardInfoContainer}>
-        <Text style={styles.giftCardLabel}>Gift Card</Text>
+        <Text style={styles.giftCardLabel}>Deal</Text>
         <View style={styles.giftCardValues}>
           <Text style={styles.giftCardPrice}>
             {formatCurrency(recommendation.giftCard.price)}
@@ -161,7 +161,7 @@ export const RecommendationCard: React.FC<RecommendationCardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: LIGHT_GREY,
+    backgroundColor: COLORS.secondary,
     borderRadius: 12,
     padding: 20,
     marginVertical: 8,
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
   content: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     marginBottom: 16,
     flex: 1,
   },
@@ -201,13 +201,17 @@ const styles = StyleSheet.create({
   },
   merchantInfo: {
     flex: 1,
+    justifyContent: 'center',
+    height: 64, // Match icon container height for perfect alignment
   },
   merchantName: {
     fontSize: 24,
     fontFamily: FONTS.bold,
     fontWeight: '700',
     color: COLORS.text,
-    marginBottom: 12,
+    lineHeight: 28,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
   },
   quarterlySpendingContainer: {
     flexDirection: 'row',
@@ -240,6 +244,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginLeft: 12,
     justifyContent: 'center',
+    height: 64, // Match icon container height for perfect alignment
   },
   rightContent: {
     flexDirection: 'row',
@@ -309,7 +314,7 @@ const styles = StyleSheet.create({
     backgroundColor: LIGHT_GREEN,
     paddingVertical: 14,
     paddingHorizontal: 24,
-    borderRadius: 8,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
