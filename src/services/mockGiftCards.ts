@@ -144,6 +144,15 @@ export const mockGiftCards: GiftCard[] = [
     source: 'Sam\'s Club',
     category: 'Entertainment',
   },
+  {
+    id: 'gc_uber_costco',
+    merchant: 'Uber',
+    discountPercent: 20,
+    availableAmount: 100,
+    price: 80,
+    source: 'Costco',
+    category: 'Travel',
+  },
 ];
 
 export const getGiftCardByMerchant = (merchantName: string): GiftCard | undefined => {

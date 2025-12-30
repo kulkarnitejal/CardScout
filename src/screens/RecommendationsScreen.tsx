@@ -7,7 +7,6 @@ import {
   RefreshControl,
 } from 'react-native';
 import { Transaction, Recommendation } from '../types';
-import { loadTransactions, loadOrGenerateTransactions } from '../services/storageService';
 import { analyzeMerchants } from '../services/merchantAnalyzer';
 import { generateRecommendations } from '../services/recommendationEngine';
 import { RecommendationCard } from '../components/RecommendationCard';
@@ -18,6 +17,8 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { RootStackParamList, BackParamList } from '../navigation/AppNavigator';
 import { COLORS, FONTS } from '../utils/constants';
+import { getCurrentUser } from '../services/supabaseService';
+import { getTransactions } from '../services/supabaseService';
 
 type RecommendationsScreenNavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<BackParamList, 'Benefits'>,
@@ -37,13 +38,54 @@ export const RecommendationsScreen: React.FC = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      // Use loadOrGenerateTransactions to ensure we have transactions with current merchants
-      const transactions = await loadOrGenerateTransactions(100);
+      
+      // Get current user
+      const user = await getCurrentUser();
+      if (!user) {
+        console.log('No user logged in, cannot load transactions');
+        setRecommendations([]);
+        return;
+      }
+
+      // Load transactions from Supabase (last 90 days)
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - 90);
+
+      const { data: supabaseTransactions, error } = await getTransactions(user.id, {
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0],
+        limit: 500,
+      });
+
+      if (error) {
+        console.error('Error loading transactions from Supabase:', error);
+        setRecommendations([]);
+        return;
+      }
+
+      if (!supabaseTransactions || supabaseTransactions.length === 0) {
+        console.log('No transactions found in Supabase');
+        setRecommendations([]);
+        return;
+      }
+
+      // Convert Supabase transactions to our Transaction format
+      const transactions: Transaction[] = supabaseTransactions.map((txn: any) => ({
+        id: txn.transaction_id,
+        date: new Date(txn.date),
+        merchant: txn.merchant_name || txn.name || 'Unknown',
+        amount: Math.abs(txn.amount),
+        category: txn.category || txn.personal_finance_category?.primary || 'Other',
+      }));
+
+      // Generate recommendations from real transactions
       const merchants = analyzeMerchants(transactions);
       const recs = generateRecommendations(merchants, transactions);
       setRecommendations(recs);
     } catch (error) {
       console.error('Error loading recommendations:', error);
+      setRecommendations([]);
     } finally {
       setLoading(false);
     }
@@ -100,7 +142,9 @@ export const RecommendationsScreen: React.FC = () => {
               No recommendations available yet.
             </Text>
             <Text style={styles.emptySubtext}>
-              Connect your bank account to analyze your spending and get personalized gift card recommendations.
+              {recommendations.length === 0 && !loading
+                ? 'Connect your bank account and make some transactions to get personalized gift card recommendations.'
+                : 'Connect your bank account to analyze your spending and get personalized gift card recommendations.'}
             </Text>
           </View>
         }

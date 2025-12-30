@@ -95,27 +95,27 @@ export const AppNavigator: React.FC = () => {
         {user ? (
           // User is logged in - show main app
           <>
-            <Stack.Screen
-              name="Back"
-              component={BackNavigator}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name="Transactions"
-              component={TransactionsScreen}
-              options={{
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name="GiftCardDetail"
-              component={GiftCardDetailScreen}
-              options={{
-                title: 'Gift Card Details',
-              }}
-            />
+        <Stack.Screen
+          name="Back"
+          component={BackNavigator}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="Transactions"
+          component={TransactionsScreen}
+          options={{
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="GiftCardDetail"
+          component={GiftCardDetailScreen}
+          options={{
+            title: 'Gift Card Details',
+          }}
+        />
           </>
         ) : (
           // User is not logged in - show auth screens

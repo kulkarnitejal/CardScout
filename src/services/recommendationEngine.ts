@@ -1,7 +1,6 @@
 import { Merchant, GiftCard, Recommendation, Transaction } from '../types';
 import { getAllGiftCards, getGiftCardByMerchant } from './mockGiftCards';
 import { calculateMonthlySpending } from './merchantAnalyzer';
-import { MIN_MONTHLY_SPENDING, MIN_DISCOUNT_THRESHOLD, TOP_RECOMMENDATIONS_COUNT } from '../utils/constants';
 
 const fuzzyMatchMerchant = (merchantName: string, giftCardMerchant: string): boolean => {
   const normalizedMerchant = merchantName.toLowerCase().trim();
@@ -40,18 +39,8 @@ export const generateRecommendations = (
       return; // No matching gift card found
     }
 
-    // Check discount threshold
-    if (giftCard.discountPercent < MIN_DISCOUNT_THRESHOLD) {
-      return;
-    }
-
     // Calculate monthly spending
     const monthlySpending = calculateMonthlySpending(transactions, merchant.name);
-    
-    // Check minimum spending threshold
-    if (monthlySpending < MIN_MONTHLY_SPENDING) {
-      return;
-    }
 
     // Calculate potential savings
     const potentialSavings = Math.round((monthlySpending * giftCard.discountPercent / 100) * 100) / 100;
@@ -72,7 +61,7 @@ export const generateRecommendations = (
   recommendations.sort((a, b) => b.annualSavings - a.annualSavings);
 
   // Return top recommendations
-  return recommendations.slice(0, TOP_RECOMMENDATIONS_COUNT);
+  return recommendations.slice();
 };
 
 export const getRecommendationById = (

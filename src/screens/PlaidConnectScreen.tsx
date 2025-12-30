@@ -12,9 +12,6 @@ import {
 } from 'react-native';
 import { create, open, destroy, LinkSuccess, LinkExit, LinkTokenConfiguration } from 'react-native-plaid-link-sdk';
 import { Transaction } from '../types';
-import { 
-  loadOrGenerateTransactions,
-} from '../services/storageService';
 import { TransactionCard } from '../components/TransactionCard';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { COLORS, FONTS } from '../utils/constants';
@@ -56,9 +53,8 @@ export const PlaidConnectScreen: React.FC = () => {
       // Get current user
       const user = await getCurrentUser();
       if (!user) {
-        // No user logged in, use mock data
-        const loadedTransactions = await loadOrGenerateTransactions(100);
-        setTransactions(loadedTransactions);
+        // No user logged in, no transactions to show
+        setTransactions([]);
         return;
       }
 
@@ -69,15 +65,12 @@ export const PlaidConnectScreen: React.FC = () => {
         // Load transactions from Supabase
         await loadTransactionsFromSupabase(user.id);
       } else {
-        // Use mock transactions if no Plaid connection
-        const loadedTransactions = await loadOrGenerateTransactions(100);
-        setTransactions(loadedTransactions);
+        // No Plaid connection, no transactions to show
+        setTransactions([]);
       }
     } catch (error) {
       console.error('Error loading transactions:', error);
-      // Fallback to mock data on error
-      const loadedTransactions = await loadOrGenerateTransactions(100);
-      setTransactions(loadedTransactions);
+      setTransactions([]);
     } finally {
       setLoading(false);
     }
@@ -113,15 +106,12 @@ export const PlaidConnectScreen: React.FC = () => {
 
         setTransactions(formattedTransactions);
       } else {
-        // No transactions in Supabase yet, use mock data
-        const loadedTransactions = await loadOrGenerateTransactions(100);
-        setTransactions(loadedTransactions);
+        // No transactions in Supabase yet
+        setTransactions([]);
       }
     } catch (error) {
       console.error('Error loading transactions from Supabase:', error);
-      // Fallback to mock data
-      const loadedTransactions = await loadOrGenerateTransactions(100);
-      setTransactions(loadedTransactions);
+      setTransactions([]);
     }
   };
 

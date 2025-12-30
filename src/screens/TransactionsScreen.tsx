@@ -7,10 +7,10 @@ import {
   RefreshControl,
 } from 'react-native';
 import { Transaction } from '../types';
-import { loadTransactions, loadOrGenerateTransactions, regenerateTransactions } from '../services/storageService';
 import { TransactionCard } from '../components/TransactionCard';
 import { LoadingSpinner } from '../components/LoadingSpinner';
 import { COLORS, FONTS } from '../utils/constants';
+import { getCurrentUser, getTransactions } from '../services/supabaseService';
 
 export const TransactionsScreen: React.FC = () => {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -24,11 +24,51 @@ export const TransactionsScreen: React.FC = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      // Use loadOrGenerateTransactions to ensure we have transactions with current merchants
-      const loadedTransactions = await loadOrGenerateTransactions(100);
-      setTransactions(loadedTransactions);
+      
+      // Get current user
+      const user = await getCurrentUser();
+      if (!user) {
+        console.log('No user logged in, cannot load transactions');
+        setTransactions([]);
+        return;
+      }
+
+      // Load transactions from Supabase (last 90 days)
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(startDate.getDate() - 90);
+
+      const { data: supabaseTransactions, error } = await getTransactions(user.id, {
+        startDate: startDate.toISOString().split('T')[0],
+        endDate: endDate.toISOString().split('T')[0],
+        limit: 500,
+      });
+
+      if (error) {
+        console.error('Error loading transactions from Supabase:', error);
+        setTransactions([]);
+        return;
+      }
+
+      if (!supabaseTransactions || supabaseTransactions.length === 0) {
+        console.log('No transactions found in Supabase');
+        setTransactions([]);
+        return;
+      }
+
+      // Convert Supabase transactions to our Transaction format
+      const formattedTransactions: Transaction[] = supabaseTransactions.map((txn: any) => ({
+        id: txn.transaction_id,
+        date: new Date(txn.date),
+        merchant: txn.merchant_name || txn.name || 'Unknown',
+        amount: Math.abs(txn.amount),
+        category: txn.category || txn.personal_finance_category?.primary || 'Other',
+      }));
+
+      setTransactions(formattedTransactions);
     } catch (error) {
       console.error('Error loading transactions:', error);
+      setTransactions([]);
     } finally {
       setLoading(false);
     }
@@ -36,16 +76,8 @@ export const TransactionsScreen: React.FC = () => {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    // Regenerate transactions to get fresh data with current merchants
-    try {
-      const newTransactions = await regenerateTransactions(100);
-      setTransactions(newTransactions);
-    } catch (error) {
-      console.error('Error regenerating transactions:', error);
-      await loadData();
-    } finally {
-      setRefreshing(false);
-    }
+    await loadData();
+    setRefreshing(false);
   };
 
   if (loading) {
@@ -72,6 +104,9 @@ export const TransactionsScreen: React.FC = () => {
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>No transactions found</Text>
+            <Text style={styles.emptySubtext}>
+              Connect your bank account to see your transactions here.
+            </Text>
           </View>
         }
       />
@@ -110,9 +145,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   emptyText: {
-    fontSize: 16,
+    fontSize: 18,
+    fontFamily: FONTS.semiBold,
+    fontWeight: '600',
+    color: COLORS.text,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  emptySubtext: {
+    fontSize: 14,
     fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
+    textAlign: 'center',
   },
 });
 

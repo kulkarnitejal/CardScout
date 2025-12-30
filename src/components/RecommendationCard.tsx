@@ -12,7 +12,8 @@ interface RecommendationCardProps {
 // Map gift card sources to their website URLs
 const getSourceUrl = (source: string, merchant: string): string => {
   const sourceMap: { [key: string]: string } = {
-    'Sam\'s Club': 'https://www.samsclub.com/browse/Gift-Cards/1003'
+    'Sam\'s Club': 'https://www.samsclub.com/browse/Gift-Cards/1003',
+    'Costco': 'https://www.costco.com/gift-cards-tickets.html'
   }
   
   const baseUrl = sourceMap[source] || 'https://www.google.com/search?q=' + encodeURIComponent(`${merchant} gift card`);
