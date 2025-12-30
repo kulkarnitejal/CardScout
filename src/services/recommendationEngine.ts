@@ -1,6 +1,6 @@
 import { Merchant, GiftCard, Recommendation, Transaction } from '../types';
 import { getAllGiftCards, getGiftCardByMerchant } from './mockGiftCards';
-import { calculateMonthlySpending } from './merchantAnalyzer';
+import { calculateThreeMonthSpending } from './merchantAnalyzer';
 
 const fuzzyMatchMerchant = (merchantName: string, giftCardMerchant: string): boolean => {
   const normalizedMerchant = merchantName.toLowerCase().trim();
@@ -39,11 +39,12 @@ export const generateRecommendations = (
       return; // No matching gift card found
     }
 
-    // Calculate monthly spending
-    const monthlySpending = calculateMonthlySpending(transactions, merchant.name);
+    // Calculate 3-month spending
+    const threeMonthSpending = calculateThreeMonthSpending(transactions, merchant.name);
 
-    // Calculate potential savings
-    const potentialSavings = Math.round((monthlySpending * giftCard.discountPercent / 100) * 100) / 100;
+    // Calculate potential savings (based on monthly average from 3-month data)
+    const monthlyAverage = threeMonthSpending / 3;
+    const potentialSavings = Math.round((monthlyAverage * giftCard.discountPercent / 100) * 100) / 100;
     const annualSavings = Math.round((potentialSavings * 12) * 100) / 100;
 
     recommendations.push({
@@ -51,7 +52,7 @@ export const generateRecommendations = (
       merchant,
       giftCard,
       potentialSavings,
-      monthlySpending,
+      threeMonthSpending,
       annualSavings,
       savingsPercent: giftCard.discountPercent,
     });

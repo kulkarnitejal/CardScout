@@ -63,9 +63,9 @@ export const GiftCardDetailScreen: React.FC = () => {
           <Text style={styles.sectionTitle}>Savings Breakdown</Text>
           
           <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Monthly Spending</Text>
+            <Text style={styles.infoLabel}>3-Month Spending</Text>
             <Text style={styles.infoValue}>
-              {formatCurrency(recommendation.monthlySpending)}
+              {formatCurrency(recommendation.threeMonthSpending)}
             </Text>
           </View>
 

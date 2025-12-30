@@ -3,6 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity, Linking } from 'react-native'
 import { Recommendation } from '../types';
 import { formatCurrency, formatPercent } from '../utils/formatters';
 import { COLORS, FONTS } from '../utils/constants';
+// @ts-ignore - @expo/vector-icons is available in Expo
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 interface RecommendationCardProps {
   recommendation: Recommendation;
@@ -20,11 +22,53 @@ const getSourceUrl = (source: string, merchant: string): string => {
   return baseUrl;
 };
 
+// Get icon name based on category
+const getIconName = (category: string): keyof typeof MaterialCommunityIcons.glyphMap => {
+  const categoryLower = category.toLowerCase();
+  const iconMap: { [key: string]: keyof typeof MaterialCommunityIcons.glyphMap } = {
+    'food & drink': 'silverware-fork-knife',
+    'restaurant': 'silverware-fork-knife',
+    'groceries': 'cart-outline',
+    'grocery': 'cart-outline',
+    'transportation': 'car',
+    'travel': 'airplane',
+    'retail': 'shopping',
+    'entertainment': 'movie',
+    'gas stations': 'gas-station',
+    'gas': 'gas-station',
+    'fuel': 'gas-station',
+    'coffee shops': 'coffee',
+    'coffee': 'coffee',
+    'fast food': 'food',
+    'fast food restaurants': 'food',
+  };
+  
+  // Try exact match first
+  if (iconMap[categoryLower]) {
+    return iconMap[categoryLower];
+  }
+  
+  // Try partial match
+  for (const [key, icon] of Object.entries(iconMap)) {
+    if (categoryLower.includes(key) || key.includes(categoryLower)) {
+      return icon;
+    }
+  }
+  
+  // Default fallback
+  return 'store';
+};
+
+// Theme colors
+const LIGHT_GREEN = '#648767'; // Light green for CTA
+const TERRACOTTA = '#B4654A'; // Terracotta for secondary
+const LIGHT_GREY = '#F5F5F5'; // Light grey background
+
 export const RecommendationCard: React.FC<RecommendationCardProps> = ({
   recommendation,
   onPress,
 }) => {
-  const handleBuyNow = async () => {
+  const handleGetCard = async () => {
     const url = getSourceUrl(recommendation.giftCard.source, recommendation.merchant.name);
     try {
       const supported = await Linking.canOpenURL(url);
@@ -36,66 +80,71 @@ export const RecommendationCard: React.FC<RecommendationCardProps> = ({
     }
   };
 
+  const iconName = getIconName(recommendation.merchant.category);
+  const quarterlySpending = recommendation.threeMonthSpending; // Already 3 months = quarterly
+
   const CardContent = (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.merchantInfo}>
-          <Text style={styles.merchantName}>{recommendation.merchant.name}</Text>
-          <Text style={styles.category}>{recommendation.merchant.category}</Text>
-        </View>
-        <View style={styles.headerRight}>
-          <View style={styles.discountBadge}>
-            <Text style={styles.discountText}>
-              {formatPercent(recommendation.savingsPercent)} OFF
-            </Text>
+      <View style={styles.content}>
+        <View style={styles.leftSection}>
+          <View style={styles.iconContainer}>
+            <MaterialCommunityIcons
+              name={iconName}
+              size={48}
+              color={TERRACOTTA}
+            />
           </View>
-          {onPress && (
-            <View style={styles.arrowContainer}>
-              <Text style={styles.arrow}>›</Text>
+          <View style={styles.merchantInfo}>
+            <Text style={styles.merchantName}>{recommendation.merchant.name}</Text>
+          </View>
+        </View>
+
+        <View style={styles.rightSection}>
+          <View style={styles.rightContent}>
+            <View style={styles.discountBadge}>
+              <Text style={styles.discountText}>
+                {formatPercent(recommendation.savingsPercent)} OFF
+              </Text>
             </View>
-          )}
-        </View>
-      </View>
-
-      <View style={styles.savingsContainer}>
-        <View style={styles.savingsRow}>
-          <Text style={styles.savingsLabel}>Monthly Spending</Text>
-          <Text style={styles.savingsValue}>{formatCurrency(recommendation.monthlySpending)}</Text>
-        </View>
-
-        <View style={styles.savingsRow}>
-          <Text style={styles.savingsLabel}>Gift Card</Text>
-          <View style={styles.giftCardValue}>
-            <Text style={styles.giftCardAmount}>{formatCurrency(recommendation.giftCard.availableAmount)}</Text>
-            <Text style={styles.giftCardPrice}>Pay {formatCurrency(recommendation.giftCard.price)}</Text>
+            {onPress && (
+              <MaterialCommunityIcons
+                name="chevron-right"
+                size={28}
+                color={COLORS.textSecondary}
+                style={styles.arrow}
+              />
+            )}
           </View>
         </View>
+      </View>
 
-        <View style={[styles.savingsRow, styles.savingsRowLast]}>
-          <Text style={styles.savingsLabel}>Monthly Savings</Text>
-          <Text style={[styles.savingsValue, styles.annualSavings]}>
-            {formatCurrency(recommendation.potentialSavings)}
+      <View style={styles.quarterlySpendingContainer}>
+        <Text style={styles.quarterlySpendingLabel}>Avg. Quarterly Spend</Text>
+        <Text style={styles.quarterlySpendingValue}>
+          {formatCurrency(quarterlySpending)}
+        </Text>
+      </View>
+
+      <View style={styles.giftCardInfoContainer}>
+        <Text style={styles.giftCardLabel}>Gift Card</Text>
+        <View style={styles.giftCardValues}>
+          <Text style={styles.giftCardPrice}>
+            {formatCurrency(recommendation.giftCard.price)}
+          </Text>
+          <Text style={styles.giftCardSeparator}>for</Text>
+          <Text style={styles.giftCardValue}>
+            {formatCurrency(recommendation.giftCard.availableAmount)} value
           </Text>
         </View>
       </View>
 
-      <View style={styles.footer}>
-        <View style={styles.footerLeft}>
-          <Text style={styles.source}>
-            Available via {recommendation.giftCard.source}
-          </Text>
-          <Text style={styles.availableAmount}>
-            Up to {formatCurrency(recommendation.giftCard.availableAmount)} available
-          </Text>
-        </View>
-        <TouchableOpacity 
-          style={styles.buyNowButton}
-          onPress={handleBuyNow}
-          activeOpacity={0.7}
-        >
-          <Text style={styles.buyNowText}>Buy Now</Text>
-        </TouchableOpacity>
-      </View>
+      <TouchableOpacity 
+        style={styles.getCardButton}
+        onPress={handleGetCard}
+        activeOpacity={0.8}
+      >
+        <Text style={styles.getCardText}>Get Card</Text>
+      </TouchableOpacity>
     </View>
   );
 
@@ -112,156 +161,165 @@ export const RecommendationCard: React.FC<RecommendationCardProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: LIGHT_GREY,
     borderRadius: 12,
-    padding: 16,
+    padding: 20,
     marginVertical: 8,
     marginHorizontal: 16,
+    minHeight: 160,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.15,
-    shadowRadius: 4,
-    elevation: 3,
-    borderLeftWidth: 4,
-    borderLeftColor: COLORS.primary,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
   },
-  header: {
+  content: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginBottom: 16,
+    flex: 1,
+  },
+  leftSection: {
+    flexDirection: 'row',
+    flex: 1,
+    alignItems: 'center',
+  },
+  iconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 12,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
   },
   merchantInfo: {
     flex: 1,
   },
-  headerRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: 12,
-  },
-  arrowContainer: {
-    marginLeft: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  arrow: {
-    fontSize: 24,
-    color: COLORS.primary,
-    fontFamily: FONTS.bold,
-    fontWeight: '700',
-  },
   merchantName: {
-    fontSize: 20,
+    fontSize: 24,
     fontFamily: FONTS.bold,
     fontWeight: '700',
     color: COLORS.text,
-    marginBottom: 4,
-  },
-  category: {
-    fontSize: 14,
-    fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
-  },
-  discountBadge: {
-    backgroundColor: COLORS.success,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-  discountText: {
-    color: '#fff',
-    fontSize: 14,
-    fontFamily: FONTS.bold,
-    fontWeight: '700',
-  },
-  savingsContainer: {
-    backgroundColor: COLORS.secondary,
-    borderRadius: 8,
-    padding: 12,
     marginBottom: 12,
   },
-  savingsRow: {
+  quarterlySpendingContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
-    paddingBottom: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(0, 0, 0, 0.05)',
+    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.background,
+    marginTop: 12,
+    marginBottom: 12,
   },
-  savingsRowLast: {
-    marginBottom: 0,
-    paddingBottom: 0,
-    borderBottomWidth: 0,
-  },
-  savingsLabel: {
-    fontSize: 13,
+  quarterlySpendingLabel: {
+    fontSize: 11,
     fontFamily: FONTS.medium,
     color: COLORS.textSecondary,
     fontWeight: '500',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
-  savingsValue: {
-    fontSize: 16,
-    fontFamily: FONTS.semiBold,
-    fontWeight: '600',
-    color: COLORS.text,
-  },
-  giftCardValue: {
-    alignItems: 'flex-end',
-  },
-  giftCardAmount: {
-    fontSize: 16,
-    fontFamily: FONTS.semiBold,
-    fontWeight: '600',
-    color: COLORS.text,
-    marginBottom: 2,
-  },
-  giftCardPrice: {
-    fontSize: 12,
-    fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
-  },
-  annualSavings: {
+  quarterlySpendingValue: {
     fontSize: 18,
     fontFamily: FONTS.bold,
-    color: COLORS.success,
+    color: COLORS.text,
     fontWeight: '700',
   },
-  footer: {
+  rightSection: {
+    alignItems: 'center',
+    marginLeft: 12,
+    justifyContent: 'center',
+  },
+  rightContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  discountBadge: {
+    backgroundColor: TERRACOTTA,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 24,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  discountText: {
+    color: '#fff',
+    fontSize: 16,
+    fontFamily: FONTS.bold,
+    fontWeight: '700',
+  },
+  arrow: {
+    // No margin needed, aligned with badge
+  },
+  giftCardInfoContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.background,
+    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: COLORS.background,
+    marginBottom: 12,
   },
-  footerLeft: {
-    flex: 1,
+  giftCardLabel: {
+    fontSize: 11,
+    fontFamily: FONTS.medium,
+    color: COLORS.textSecondary,
+    fontWeight: '500',
+    textTransform: 'uppercase',
+    letterSpacing: 0.5,
   },
-  source: {
-    fontSize: 12,
+  giftCardValues: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  giftCardPrice: {
+    fontSize: 18,
+    fontFamily: FONTS.bold,
+    color: TERRACOTTA,
+    fontWeight: '700',
+  },
+  giftCardSeparator: {
+    fontSize: 14,
     fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
-    marginBottom: 2,
   },
-  availableAmount: {
-    fontSize: 12,
+  giftCardValue: {
+    fontSize: 16,
     fontFamily: FONTS.semiBold,
-    color: COLORS.primary,
+    color: COLORS.text,
     fontWeight: '600',
   },
-  buyNowButton: {
-    backgroundColor: COLORS.primary,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+  getCardButton: {
+    backgroundColor: LIGHT_GREEN,
+    paddingVertical: 14,
+    paddingHorizontal: 24,
     borderRadius: 8,
-    marginLeft: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
   },
-  buyNowText: {
+  getCardText: {
     color: '#fff',
-    fontSize: 12,
+    fontSize: 16,
     fontFamily: FONTS.semiBold,
     fontWeight: '600',
   },
 });
+
 

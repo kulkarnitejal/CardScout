@@ -59,8 +59,8 @@ if (__DEV__) {
 
 export const COLORS = {
   primary: '#B4654A',
-  secondary: '#F8F5F1',
-  background: '#EAE0D5',
+  secondary: '#F4FAF2',
+  background: '#DFE8DC',
   surface: '#ffffff',
   error: '#b00020',
   text: '#000000',

@@ -30,7 +30,7 @@ export interface Recommendation {
   merchant: Merchant;
   giftCard: GiftCard;
   potentialSavings: number;
-  monthlySpending: number;
+  threeMonthSpending: number;
   annualSavings: number;
   savingsPercent: number;
 }

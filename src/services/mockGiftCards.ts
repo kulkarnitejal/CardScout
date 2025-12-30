@@ -137,12 +137,12 @@ export const mockGiftCards: GiftCard[] = [
   },
   {
     id: 'gc_amc_samsclub',
-    merchant: 'AMC Theatres',
+    merchant: 'KFC',
     discountPercent: 40,
     availableAmount: 50,
     price: 40,
     source: 'Sam\'s Club',
-    category: 'Entertainment',
+    category: 'Restaurant',
   },
   {
     id: 'gc_uber_costco',

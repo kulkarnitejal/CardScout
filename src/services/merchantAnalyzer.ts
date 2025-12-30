@@ -51,16 +51,32 @@ export const getTopMerchants = (
   return merchants.slice(0, limit);
 };
 
-export const calculateMonthlySpending = (
+export const calculateThreeMonthSpending = (
   transactions: Transaction[],
   merchantName: string
 ): number => {
-  const last30Days = getLast30DaysTransactions(transactions);
-  const merchantTransactions = last30Days.filter(
+  const now = new Date();
+  const threeMonthsAgo = new Date();
+  threeMonthsAgo.setMonth(now.getMonth() - 3);
+  
+  const last90Days = transactions.filter(
+    (txn) => txn.date >= threeMonthsAgo && txn.date <= now
+  );
+  
+  const merchantTransactions = last90Days.filter(
     (txn) => txn.merchant.toLowerCase() === merchantName.toLowerCase()
   );
   
   const total = merchantTransactions.reduce((sum, txn) => sum + txn.amount, 0);
   return Math.round(total * 100) / 100;
+};
+
+// Keep for backward compatibility
+export const calculateMonthlySpending = (
+  transactions: Transaction[],
+  merchantName: string
+): number => {
+  const threeMonthSpending = calculateThreeMonthSpending(transactions, merchantName);
+  return Math.round((threeMonthSpending / 3) * 100) / 100;
 };
 
