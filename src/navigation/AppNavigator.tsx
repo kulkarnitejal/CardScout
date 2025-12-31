@@ -45,6 +45,7 @@ const BackNavigator: React.FC = () => {
   );
 };
 
+
 const AuthStack = createStackNavigator();
 
 const AuthNavigator: React.FC = () => {

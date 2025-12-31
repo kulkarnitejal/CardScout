@@ -32,7 +32,7 @@ export const analyzeMerchants = (transactions: Transaction[]): Merchant[] => {
     
     merchants.push({
       name: data.transactions[0].merchant, // Use original casing
-      category: data.category,
+      category: data.category.replaceAll(/_/g, " "),
       totalSpent: Math.round(data.totalSpent * 100) / 100,
       transactionCount: data.transactions.length,
       averageTransaction: Math.round((data.totalSpent / data.transactions.length) * 100) / 100,

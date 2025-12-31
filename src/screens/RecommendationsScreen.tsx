@@ -5,6 +5,7 @@ import {
   StyleSheet,
   FlatList,
   RefreshControl,
+  TouchableOpacity,
 } from 'react-native';
 import { Transaction, Recommendation } from '../types';
 import { analyzeMerchants } from '../services/merchantAnalyzer';
@@ -19,6 +20,9 @@ import { RootStackParamList, BackParamList } from '../navigation/AppNavigator';
 import { COLORS, FONTS } from '../utils/constants';
 import { getCurrentUser } from '../services/supabaseService';
 import { getTransactions } from '../services/supabaseService';
+import { MenuModal } from '../components/MenuModal';
+// @ts-ignore - @expo/vector-icons is available in Expo
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 type RecommendationsScreenNavigationProp = CompositeNavigationProp<
   BottomTabNavigationProp<BackParamList, 'Benefits'>,
@@ -30,6 +34,7 @@ export const RecommendationsScreen: React.FC = () => {
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
 
   useEffect(() => {
     loadData();
@@ -109,7 +114,15 @@ export const RecommendationsScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Deals for you</Text>
+        <TouchableOpacity
+          onPress={() => setMenuVisible(true)}
+          style={styles.menuButton}
+          activeOpacity={0.7}
+        >
+          <MaterialCommunityIcons name="menu" size={24} color="#fff" />
+        </TouchableOpacity>
+        <Text style={styles.title}>All Current Deals</Text>
+        <View style={styles.menuButtonPlaceholder} />
       </View>
 
       {recommendations.length > 0 && (
@@ -149,6 +162,7 @@ export const RecommendationsScreen: React.FC = () => {
           </View>
         }
       />
+      <MenuModal visible={menuVisible} onClose={() => setMenuVisible(false)} />
     </View>
   );
 };
@@ -162,6 +176,16 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     padding: 16,
     paddingTop: 60,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  menuButton: {
+    padding: 8,
+    marginLeft: -8,
+  },
+  menuButtonPlaceholder: {
+    width: 40,
   },
   title: {
     fontSize: 32,
@@ -169,6 +193,8 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#fff',
     marginBottom: 4,
+    flex: 1,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,

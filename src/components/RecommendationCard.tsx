@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   giftCardPrice: {
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: FONTS.bold,
     color: TERRACOTTA,
     fontWeight: '700',

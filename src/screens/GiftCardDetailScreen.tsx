@@ -4,18 +4,58 @@ import { RouteProp, useRoute } from '@react-navigation/native';
 import { Recommendation } from '../types';
 import { formatCurrency, formatPercent } from '../utils/formatters';
 import { COLORS, FONTS } from '../utils/constants';
+// @ts-ignore - @expo/vector-icons is available in Expo
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 // Map gift card sources to their website URLs
 const getSourceUrl = (source: string, merchant: string): string => {
   const sourceMap: { [key: string]: string } = {
-    'GiftCardMarketplace': 'https://www.giftcardmarketplace.com',
-    'CardCash': 'https://www.cardcash.com',
-    'Raise': 'https://www.raise.com',
+    'Sam\'s Club': 'https://www.samsclub.com/browse/Gift-Cards/1003',
+    'Costco': 'https://www.costco.com/gift-cards-tickets.html'
   };
   
   const baseUrl = sourceMap[source] || 'https://www.google.com/search?q=' + encodeURIComponent(`${merchant} gift card`);
   return baseUrl;
 };
+
+// Get icon name based on category
+const getIconName = (category: string): keyof typeof MaterialCommunityIcons.glyphMap => {
+  const categoryLower = category.toLowerCase();
+  const iconMap: { [key: string]: keyof typeof MaterialCommunityIcons.glyphMap } = {
+    'food & drink': 'silverware-fork-knife',
+    'restaurant': 'silverware-fork-knife',
+    'groceries': 'cart-outline',
+    'grocery': 'cart-outline',
+    'transportation': 'car',
+    'travel': 'airplane',
+    'retail': 'shopping',
+    'entertainment': 'movie',
+    'gas stations': 'gas-station',
+    'gas': 'gas-station',
+    'fuel': 'gas-station',
+    'coffee shops': 'coffee',
+    'coffee': 'coffee',
+    'fast food': 'food',
+    'fast food restaurants': 'food',
+  };
+  
+  if (iconMap[categoryLower]) {
+    return iconMap[categoryLower];
+  }
+  
+  for (const [key, icon] of Object.entries(iconMap)) {
+    if (categoryLower.includes(key) || key.includes(categoryLower)) {
+      return icon;
+    }
+  }
+  
+  return 'store';
+};
+
+// Theme colors
+const LIGHT_GREEN = '#648767'; // Light green for CTA
+const TERRACOTTA = '#B4654A'; // Terracotta for secondary
+const LIGHT_GREY = '#F5F5F5'; // Light grey background
 
 type GiftCardDetailRouteParams = {
   GiftCardDetail: {
@@ -27,7 +67,7 @@ export const GiftCardDetailScreen: React.FC = () => {
   const route = useRoute<RouteProp<GiftCardDetailRouteParams, 'GiftCardDetail'>>();
   const { recommendation } = route.params;
 
-  const handleBuyNow = async () => {
+  const handleGetCard = async () => {
     const url = getSourceUrl(recommendation.giftCard.source, recommendation.merchant.name);
     try {
       const supported = await Linking.canOpenURL(url);
@@ -39,84 +79,55 @@ export const GiftCardDetailScreen: React.FC = () => {
     }
   };
 
+  const iconName = getIconName(recommendation.merchant.category);
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.merchantName}>{recommendation.merchant.name}</Text>
-       
+        <View style={styles.headerLeft}>
+          <View style={styles.iconContainer}>
+            <MaterialCommunityIcons
+              name={iconName}
+              size={48}
+              color={TERRACOTTA}
+            />
+          </View>
+          <View style={styles.merchantInfo}>
+            <Text style={styles.merchantName}>{recommendation.merchant.name}</Text>
+            <Text style={styles.category}>{recommendation.merchant.category}</Text>
+          </View>
+        </View>
         <View style={styles.discountBadge}>
           <Text style={styles.discountText}>
             {formatPercent(recommendation.savingsPercent)} OFF
           </Text>
         </View>
-
-        <TouchableOpacity 
-            style={styles.actionButton}
-            onPress={handleBuyNow}
-          >
-            <Text style={styles.actionButtonText}>Buy Now</Text>
-          </TouchableOpacity>
       </View>
 
       <View style={styles.content}>
+        {/* Gift Card Information - First */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Savings Breakdown</Text>
+          <Text style={styles.sectionTitle}>Gift Card Deal</Text>
           
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>3-Month Spending</Text>
-            <Text style={styles.infoValue}>
-              {formatCurrency(recommendation.threeMonthSpending)}
-            </Text>
+          <View style={styles.infoContainer}>
+            <Text style={styles.infoLabel}>Gift Card</Text>
+            <View style={styles.infoValueContainer}>
+              <Text style={styles.giftCardPrice}>
+                {formatCurrency(recommendation.giftCard.price)}
+              </Text>
+              <Text style={styles.giftCardSeparator}>for</Text>
+              <Text style={styles.giftCardValue}>
+                {formatCurrency(recommendation.giftCard.availableAmount)} value
+              </Text>
+            </View>
           </View>
 
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Discount Rate</Text>
-            <Text style={styles.infoValue}>
-              {formatPercent(recommendation.savingsPercent)}
-            </Text>
-          </View>
-
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Monthly Savings</Text>
-            <Text style={[styles.infoValue, styles.savingsValue]}>
-              {formatCurrency(recommendation.potentialSavings)}
-            </Text>
-          </View>
-
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Projected Annual Savings</Text>
-            <Text style={[styles.infoValue, styles.annualSavings]}>
-              {formatCurrency(recommendation.annualSavings)}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Gift Card Information</Text>
-          
-          <View style={styles.infoRow}>
+          <View style={styles.infoContainer}>
             <Text style={styles.infoLabel}>Source</Text>
             <Text style={styles.infoValue}>{recommendation.giftCard.source}</Text>
           </View>
 
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Gift Card Value</Text>
-            <Text style={styles.infoValue}>
-              {formatCurrency(recommendation.giftCard.availableAmount)}
-            </Text>
-          </View>
-
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Price</Text>
-            <Text style={styles.infoValue}>
-              {formatCurrency(
-                recommendation.giftCard.availableAmount * 
-                (1 - recommendation.giftCard.discountPercent / 100)
-              )}
-            </Text>
-          </View>
-
-          <View style={styles.infoRow}>
+          <View style={styles.infoContainer}>
             <Text style={styles.infoLabel}>Discount</Text>
             <Text style={styles.infoValue}>
               {formatPercent(recommendation.giftCard.discountPercent)}
@@ -124,39 +135,52 @@ export const GiftCardDetailScreen: React.FC = () => {
           </View>
 
           <TouchableOpacity 
-            style={styles.actionButton}
-            onPress={handleBuyNow}
+            style={styles.getCardButton}
+            onPress={handleGetCard}
+            activeOpacity={0.8}
           >
-            <Text style={styles.actionButtonText}>Buy Now</Text>
+            <Text style={styles.getCardText}>Get Card</Text>
           </TouchableOpacity>
         </View>
 
+        {/* Transaction Details & Projected Savings - Second */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Merchant Details</Text>
+          <Text style={styles.sectionTitle}>Your Spending & Savings</Text>
           
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Category</Text>
-            <Text style={styles.infoValue}>{recommendation.merchant.category}</Text>
+          <View style={styles.infoContainer}>
+            <Text style={styles.infoLabel}>Your Avg. Quarterly Spend</Text>
+            <Text style={styles.infoValue}>
+              {formatCurrency(recommendation.threeMonthSpending)}
+            </Text>
           </View>
 
-          <View style={styles.infoRow}>
+          <View style={styles.infoContainer}>
             <Text style={styles.infoLabel}>Total Transactions</Text>
             <Text style={styles.infoValue}>
               {recommendation.merchant.transactionCount}
             </Text>
           </View>
 
-          <View style={styles.infoRow}>
-            <Text style={styles.infoLabel}>Total Spent (All Time)</Text>
-            <Text style={styles.infoValue}>
-              {formatCurrency(recommendation.merchant.totalSpent)}
-            </Text>
-          </View>
-
-          <View style={styles.infoRow}>
+          <View style={styles.infoContainer}>
             <Text style={styles.infoLabel}>Average Transaction</Text>
             <Text style={styles.infoValue}>
               {formatCurrency(recommendation.merchant.averageTransaction)}
+            </Text>
+          </View>
+
+          <View style={styles.divider} />
+
+          <View style={styles.savingsContainer}>
+            <Text style={styles.savingsLabel}>Monthly Savings</Text>
+            <Text style={styles.savingsValue}>
+              {formatCurrency(recommendation.potentialSavings)}
+            </Text>
+          </View>
+
+          <View style={styles.savingsContainer}>
+            <Text style={styles.savingsLabel}>Projected Annual Savings</Text>
+            <Text style={styles.annualSavingsValue}>
+              {formatCurrency(recommendation.annualSavings)}
             </Text>
           </View>
         </View>
@@ -171,25 +195,55 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   header: {
-    backgroundColor: COLORS.background,
-    padding: 24,
+    backgroundColor: COLORS.secondary,
+    padding: 20,
     paddingTop: 16,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  headerLeft: {
+    flexDirection: 'row',
+    flex: 1,
+    alignItems: 'center',
+  },
+  iconContainer: {
+    width: 64,
+    height: 64,
+    borderRadius: 12,
+    backgroundColor: '#fff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  merchantInfo: {
+    flex: 1,
+    justifyContent: 'center',
+  },
   merchantName: {
-    fontSize: 28,
+    fontSize: 24,
     fontFamily: FONTS.bold,
     fontWeight: '700',
     color: COLORS.text,
-    flex: 1,
+    marginBottom: 4,
+  },
+  category: {
+    fontSize: 14,
+    fontFamily: FONTS.regular,
+    color: COLORS.textSecondary,
   },
   discountBadge: {
-    backgroundColor: COLORS.success,
+    backgroundColor: TERRACOTTA,
     paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingVertical: 10,
+    borderRadius: 24,
+    minWidth: 80,
+    alignItems: 'center',
   },
   discountText: {
     color: '#fff',
@@ -201,24 +255,24 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   section: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: COLORS.secondary,
     borderRadius: 12,
-    padding: 16,
+    padding: 20,
     marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.05,
     shadowRadius: 2,
-    elevation: 2,
+    elevation: 1,
   },
   sectionTitle: {
-    fontSize: 20,
+    fontSize: 18,
     fontFamily: FONTS.bold,
     fontWeight: '700',
     color: COLORS.text,
     marginBottom: 16,
   },
-  infoRow: {
+  infoContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -227,9 +281,10 @@ const styles = StyleSheet.create({
     borderBottomColor: COLORS.background,
   },
   infoLabel: {
-    fontSize: 16,
-    fontFamily: FONTS.regular,
+    fontSize: 14,
+    fontFamily: FONTS.medium,
     color: COLORS.textSecondary,
+    fontWeight: '500',
   },
   infoValue: {
     fontSize: 16,
@@ -237,42 +292,73 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: COLORS.text,
   },
-  savingsValue: {
-    color: COLORS.success,
+  infoValueContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
   },
-  annualSavings: {
-    fontSize: 20,
+  giftCardPrice: {
+    fontSize: 18,
     fontFamily: FONTS.bold,
+    color: TERRACOTTA,
     fontWeight: '700',
-    color: COLORS.success,
   },
-  noteContainer: {
-    backgroundColor: COLORS.surface,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 24,
-    borderLeftWidth: 4,
-    borderLeftColor: COLORS.warning,
-  },
-  noteText: {
+  giftCardSeparator: {
     fontSize: 14,
     fontFamily: FONTS.regular,
-    color: COLORS.text,
-    lineHeight: 20,
+    color: COLORS.textSecondary,
   },
-  actionButton: {
-    backgroundColor: COLORS.primary,
+  giftCardValue: {
+    fontSize: 16,
+    fontFamily: FONTS.semiBold,
+    color: COLORS.text,
+    fontWeight: '600',
+  },
+  divider: {
+    height: 3,
+    backgroundColor: LIGHT_GREEN,
+    marginVertical: 16,
+  },
+  savingsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.background,
+  },
+  savingsLabel: {
+    fontSize: 14,
+    fontFamily: FONTS.medium,
+    color: COLORS.textSecondary,
+    fontWeight: '500',
+  },
+  savingsValue: {
+    fontSize: 16,
+    fontFamily: FONTS.bold,
+    fontWeight: '700',
+    color: LIGHT_GREEN,
+  },
+  annualSavingsValue: {
+    fontSize: 18,
+    fontFamily: FONTS.bold,
+    fontWeight: '700',
+    color: LIGHT_GREEN,
+  },
+  getCardButton: {
+    backgroundColor: LIGHT_GREEN,
     paddingVertical: 14,
     paddingHorizontal: 24,
     borderRadius: 12,
     alignItems: 'center',
-    marginLeft: 12,
+    justifyContent: 'center',
+    width: '100%',
+    marginTop: 16,
   },
-  actionButtonText: {
+  getCardText: {
     color: '#fff',
     fontSize: 16,
-    fontFamily: FONTS.bold,
-    fontWeight: '700',
+    fontFamily: FONTS.semiBold,
+    fontWeight: '600',
   },
 });
-

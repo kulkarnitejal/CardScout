@@ -46,8 +46,8 @@ export const LoginScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.content}>
-          <Text style={styles.title}>Welcome Back</Text>
-          <Text style={styles.subtitle}>Sign in to continue</Text>
+          <Text style={styles.title}>Card Scout</Text>
+          <Text style={styles.subtitle}>Spend smarter</Text>
 
           <View style={styles.form}>
             <View style={styles.inputContainer}>

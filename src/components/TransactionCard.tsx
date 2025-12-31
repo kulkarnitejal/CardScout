@@ -14,7 +14,7 @@ export const TransactionCard: React.FC<TransactionCardProps> = ({ transaction })
       <View style={styles.content}>
         <View style={styles.mainInfo}>
           <Text style={styles.merchant}>{transaction.merchant}</Text>
-          <Text style={styles.category}>{transaction.category}</Text>
+          <Text style={styles.category}>{transaction.category.replaceAll(/_/g, " ")}</Text>
         </View>
         <View style={styles.amountContainer}>
           <Text style={styles.amount}>{formatCurrency(transaction.amount)}</Text>

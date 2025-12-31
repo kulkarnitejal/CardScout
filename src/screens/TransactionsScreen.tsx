@@ -62,7 +62,7 @@ export const TransactionsScreen: React.FC = () => {
         date: new Date(txn.date),
         merchant: txn.merchant_name || txn.name || 'Unknown',
         amount: Math.abs(txn.amount),
-        category: txn.category || txn.personal_finance_category?.primary || 'Other',
+        category: txn.category.replaceAll(/_/g, " ") || txn.personal_finance_category?.primary || 'Other',
       }));
 
       setTransactions(formattedTransactions);

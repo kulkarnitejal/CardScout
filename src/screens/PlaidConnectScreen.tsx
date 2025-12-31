@@ -17,6 +17,9 @@ import { LoadingSpinner } from '../components/LoadingSpinner';
 import { COLORS, FONTS } from '../utils/constants';
 import { generateLinkToken, exchangePublicToken, fetchTransactions, fetchAccounts } from '../services/plaidService';
 import { getPlaidItems, getTransactions, getCurrentUser } from '../services/supabaseService';
+import { MenuModal } from '../components/MenuModal';
+// @ts-ignore - @expo/vector-icons is available in Expo
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 export const PlaidConnectScreen: React.FC = () => {
   const [connecting, setConnecting] = useState(false);
@@ -24,6 +27,7 @@ export const PlaidConnectScreen: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [hasConnected, setHasConnected] = useState(false);
+  const [menuVisible, setMenuVisible] = useState(false);
 
   useEffect(() => {
     checkConnectionStatus();
@@ -279,14 +283,24 @@ export const PlaidConnectScreen: React.FC = () => {
 
   // Show connect flow if no accounts connected
   if (!hasConnectedAccounts) {
-    return (
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Transactions</Text>
-          <Text style={styles.subtitle}>
-            Connect your bank to view transactions
-          </Text>
-        </View>
+      return (
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <TouchableOpacity
+              onPress={() => setMenuVisible(true)}
+              style={styles.menuButton}
+              activeOpacity={0.7}
+            >
+              <MaterialCommunityIcons name="menu" size={24} color="#fff" />
+            </TouchableOpacity>
+            <View style={styles.headerTextContainer}>
+              <Text style={styles.title}>Transactions</Text>
+              <Text style={styles.subtitle}>
+                Connect your bank to view transactions
+              </Text>
+            </View>
+            <View style={styles.menuButtonPlaceholder} />
+          </View>
 
         <ScrollView style={styles.content} contentContainerStyle={styles.scrollContent}>
           <View style={styles.infoCard}>
@@ -322,19 +336,30 @@ export const PlaidConnectScreen: React.FC = () => {
             </Text>
           </View>
         </ScrollView>
+        <MenuModal visible={menuVisible} onClose={() => setMenuVisible(false)} />
       </View>
     );
   }
 
   // Show transactions if accounts are connected
-  return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>Transactions</Text>
-        <Text style={styles.subtitle}>
-          {transactions.length} total transactions
-        </Text>
-      </View>
+      return (
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <TouchableOpacity
+              onPress={() => setMenuVisible(true)}
+              style={styles.menuButton}
+              activeOpacity={0.7}
+            >
+              <MaterialCommunityIcons name="menu" size={24} color="#fff" />
+            </TouchableOpacity>
+            <View style={styles.headerTextContainer}>
+              <Text style={styles.title}>Transactions</Text>
+              <Text style={styles.subtitle}>
+                {transactions.length} total transactions
+              </Text>
+            </View>
+            <View style={styles.menuButtonPlaceholder} />
+          </View>
 
       <FlatList
         data={transactions}
@@ -363,6 +388,7 @@ export const PlaidConnectScreen: React.FC = () => {
           </View>
         }
       />
+      <MenuModal visible={menuVisible} onClose={() => setMenuVisible(false)} />
     </View>
   );
 };
@@ -376,6 +402,20 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primary,
     padding: 24,
     paddingTop: 60,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  menuButton: {
+    padding: 8,
+    marginLeft: -8,
+  },
+  menuButtonPlaceholder: {
+    width: 40,
+  },
+  headerTextContainer: {
+    flex: 1,
+    alignItems: 'center',
   },
   title: {
     fontSize: 32,
