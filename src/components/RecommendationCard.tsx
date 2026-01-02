@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   quarterlySpendingValue: {
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: FONTS.bold,
     color: COLORS.text,
     fontWeight: '700',

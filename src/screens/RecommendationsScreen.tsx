@@ -156,8 +156,8 @@ export const RecommendationsScreen: React.FC = () => {
             </Text>
             <Text style={styles.emptySubtext}>
               {recommendations.length === 0 && !loading
-                ? 'Connect your bank account and make some transactions to get personalized gift card recommendations.'
-                : 'Connect your bank account to analyze your spending and get personalized gift card recommendations.'}
+                ? 'No recommendations yet, make sure to connect your accounts to get personalized gift card recommendations.'
+                : 'Analyzing to recommend personalized deals'}
             </Text>
           </View>
         }

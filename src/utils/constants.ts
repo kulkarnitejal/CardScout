@@ -69,14 +69,13 @@ export const COLORS = {
   warning: '#ff9800',
 };
 
-// Font family similar to Clash Grotesk (geometric sans-serif)
-// Using Inter as it's similar in style - geometric, modern, clean
-// For custom Clash Grotesk, you would need to add the font files to assets/fonts
+// Modern, sleek, and highly readable font
+// Poppins is a geometric sans-serif typeface that's clean, modern, and easy to read
 export const FONTS = {
-  regular: 'Inter_400Regular',
-  medium: 'Inter_500Medium',
-  semiBold: 'Inter_600SemiBold',
-  bold: 'Inter_700Bold',
+  regular: 'Poppins_400Regular',
+  medium: 'Poppins_500Medium',
+  semiBold: 'Poppins_600SemiBold',
+  bold: 'Poppins_700Bold',
 };
 
 // Helper function to get font family based on weight
