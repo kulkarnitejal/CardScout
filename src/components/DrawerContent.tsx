@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontFamily: FONTS.bold,
     fontWeight: '700',
-    color: COLORS.primary,
+    color: COLORS.text,
     marginBottom: 8,
   },
   userEmail: {
@@ -164,7 +164,6 @@ const styles = StyleSheet.create({
   },
   menuIcon: {
     marginRight: 16,
-    color: COLORS.primary,
   },
   menuText: {
     flex: 1,

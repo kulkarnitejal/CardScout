@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   View,
   Text,
@@ -9,9 +9,11 @@ import {
 } from 'react-native';
 import { Transaction, Recommendation } from '../types';
 import { analyzeMerchants } from '../services/merchantAnalyzer';
-import { generateRecommendations } from '../services/recommendationEngine';
+import { generateRecommendations, generateAllDeals } from '../services/recommendationEngine';
 import { RecommendationCard } from '../components/RecommendationCard';
 import { LoadingSpinner } from '../components/LoadingSpinner';
+import { SegmentedControl } from '../components/SegmentedControl';
+import { SearchBar } from '../components/SearchBar';
 import { useNavigation } from '@react-navigation/native';
 import { CompositeNavigationProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -31,13 +33,18 @@ type RecommendationsScreenNavigationProp = CompositeNavigationProp<
 
 export const RecommendationsScreen: React.FC = () => {
   const navigation = useNavigation<RecommendationsScreenNavigationProp>();
-  const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [selectedSegment, setSelectedSegment] = useState(0); // 0 = "For You", 1 = "All Deals"
+  const [searchQuery, setSearchQuery] = useState('');
+  const [personalizedRecommendations, setPersonalizedRecommendations] = useState<Recommendation[]>([]);
+  const [allDeals, setAllDeals] = useState<Recommendation[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [menuVisible, setMenuVisible] = useState(false);
 
   useEffect(() => {
     loadData();
+    // Load all deals immediately (no async needed)
+    setAllDeals(generateAllDeals());
   }, []);
 
   const loadData = async () => {
@@ -48,7 +55,7 @@ export const RecommendationsScreen: React.FC = () => {
       const user = await getCurrentUser();
       if (!user) {
         console.log('No user logged in, cannot load transactions');
-        setRecommendations([]);
+        setPersonalizedRecommendations([]);
         return;
       }
 
@@ -65,13 +72,13 @@ export const RecommendationsScreen: React.FC = () => {
 
       if (error) {
         console.error('Error loading transactions from Supabase:', error);
-        setRecommendations([]);
+        setPersonalizedRecommendations([]);
         return;
       }
 
       if (!supabaseTransactions || supabaseTransactions.length === 0) {
         console.log('No transactions found in Supabase');
-        setRecommendations([]);
+        setPersonalizedRecommendations([]);
         return;
       }
 
@@ -87,10 +94,10 @@ export const RecommendationsScreen: React.FC = () => {
       // Generate recommendations from real transactions
       const merchants = analyzeMerchants(transactions);
       const recs = generateRecommendations(merchants, transactions);
-      setRecommendations(recs);
+      setPersonalizedRecommendations(recs);
     } catch (error) {
       console.error('Error loading recommendations:', error);
-      setRecommendations([]);
+      setPersonalizedRecommendations([]);
     } finally {
       setLoading(false);
     }
@@ -102,14 +109,33 @@ export const RecommendationsScreen: React.FC = () => {
     setRefreshing(false);
   };
 
-  if (loading) {
-    return <LoadingSpinner />;
-  }
+  // Filter recommendations based on search query
+  const filterRecommendations = (recs: Recommendation[]): Recommendation[] => {
+    if (!searchQuery.trim()) {
+      return recs;
+    }
+    const query = searchQuery.toLowerCase().trim();
+    return recs.filter((rec) =>
+      rec.merchant.name.toLowerCase().includes(query) ||
+      rec.merchant.category.toLowerCase().includes(query) ||
+      rec.giftCard.source.toLowerCase().includes(query)
+    );
+  };
 
-  const totalAnnualSavings = recommendations.reduce(
+  // Get current recommendations based on selected segment
+  const currentRecommendations = useMemo(() => {
+    const baseRecs = selectedSegment === 0 ? personalizedRecommendations : allDeals;
+    return filterRecommendations(baseRecs);
+  }, [selectedSegment, personalizedRecommendations, allDeals, searchQuery]);
+
+  const totalAnnualSavings = personalizedRecommendations.reduce(
     (sum, rec) => sum + rec.annualSavings,
     0
   );
+
+  if (loading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <View style={styles.container}>
@@ -125,17 +151,21 @@ export const RecommendationsScreen: React.FC = () => {
         <View style={styles.menuButtonPlaceholder} />
       </View>
 
-      {recommendations.length > 0 && (
-        <View style={styles.summaryCard}>
-          <Text style={styles.summaryLabel}>Total Potential Annual Savings</Text>
-          <Text style={styles.summaryValue}>
-            ${totalAnnualSavings.toFixed(2)}
-          </Text>
-        </View>
-      )}
+      <SegmentedControl
+        segments={['For You', 'All Deals']}
+        selectedIndex={selectedSegment}
+        onSegmentChange={setSelectedSegment}
+      />
+
+      <SearchBar
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+        placeholder="Search merchants..."
+        resultCount={currentRecommendations.length}
+      />
 
       <FlatList
-        data={recommendations}
+        data={currentRecommendations}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <RecommendationCard
@@ -147,17 +177,28 @@ export const RecommendationsScreen: React.FC = () => {
         )}
         contentContainerStyle={styles.listContent}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            enabled={selectedSegment === 0} // Only refresh for "For You" view
+          />
         }
+    
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>
-              No recommendations available yet.
+              {searchQuery.trim()
+                ? `No results for "${searchQuery}"`
+                : selectedSegment === 0
+                ? 'No recommendations available yet.'
+                : 'No deals available.'}
             </Text>
             <Text style={styles.emptySubtext}>
-              {recommendations.length === 0 && !loading
-                ? 'No recommendations yet, make sure to connect your accounts to get personalized gift card recommendations.'
-                : 'Analyzing to recommend personalized deals'}
+              {searchQuery.trim()
+                ? 'Try a different search term'
+                : selectedSegment === 0
+                ? 'Connect your bank account to see personalized gift card recommendations.'
+                : 'Check back later for new deals.'}
             </Text>
           </View>
         }

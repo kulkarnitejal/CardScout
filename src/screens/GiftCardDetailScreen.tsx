@@ -80,6 +80,7 @@ export const GiftCardDetailScreen: React.FC = () => {
   };
 
   const iconName = getIconName(recommendation.merchant.category);
+  const hasSpendingData = recommendation.threeMonthSpending > 0 || recommendation.merchant.transactionCount > 0;
 
   return (
     <ScrollView style={styles.container}>
@@ -143,47 +144,49 @@ export const GiftCardDetailScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        {/* Transaction Details & Projected Savings - Second */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Your Spending & Savings</Text>
-          
-          <View style={styles.infoContainer}>
-            <Text style={styles.infoLabel}>Your Avg. Quarterly Spend</Text>
-            <Text style={styles.infoValue}>
-              {formatCurrency(recommendation.threeMonthSpending)}
-            </Text>
-          </View>
+        {/* Transaction Details & Projected Savings - Second - Only show if user has spending data */}
+        {hasSpendingData && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Your Spending & Savings</Text>
+            
+            <View style={styles.infoContainer}>
+              <Text style={styles.infoLabel}>Your Avg. Quarterly Spend</Text>
+              <Text style={styles.infoValue}>
+                {formatCurrency(recommendation.threeMonthSpending)}
+              </Text>
+            </View>
 
-          <View style={styles.infoContainer}>
-            <Text style={styles.infoLabel}>Total Transactions</Text>
-            <Text style={styles.infoValue}>
-              {recommendation.merchant.transactionCount}
-            </Text>
-          </View>
+            <View style={styles.infoContainer}>
+              <Text style={styles.infoLabel}>Total Transactions</Text>
+              <Text style={styles.infoValue}>
+                {recommendation.merchant.transactionCount}
+              </Text>
+            </View>
 
-          <View style={styles.infoContainer}>
-            <Text style={styles.infoLabel}>Average Transaction</Text>
-            <Text style={styles.infoValue}>
-              {formatCurrency(recommendation.merchant.averageTransaction)}
-            </Text>
-          </View>
+            <View style={styles.infoContainer}>
+              <Text style={styles.infoLabel}>Average Transaction</Text>
+              <Text style={styles.infoValue}>
+                {formatCurrency(recommendation.merchant.averageTransaction)}
+              </Text>
+            </View>
 
-          {/* <View style={styles.divider} /> */}
+            {/* <View style={styles.divider} /> */}
 
-          <View style={styles.savingsContainer}>
-            <Text style={styles.savingsLabel}>Est. Monthly Savings</Text>
-            <Text style={styles.savingsValue}>
-              {formatCurrency(recommendation.potentialSavings)}
-            </Text>
-          </View>
+            <View style={styles.savingsContainer}>
+              <Text style={styles.savingsLabel}>Est. Monthly Savings</Text>
+              <Text style={styles.savingsValue}>
+                {formatCurrency(recommendation.potentialSavings)}
+              </Text>
+            </View>
 
-          <View style={styles.savingsContainerLast}>
-            <Text style={styles.savingsLabel}>Projected Annual Savings</Text>
-            <Text style={styles.annualSavingsValue}>
-              {formatCurrency(recommendation.annualSavings)}
-            </Text>
+            <View style={styles.savingsContainerLast}>
+              <Text style={styles.savingsLabel}>Projected Annual Savings</Text>
+              <Text style={styles.annualSavingsValue}>
+                {formatCurrency(recommendation.annualSavings)}
+              </Text>
+            </View>
           </View>
-        </View>
+        )}
       </View>
     </ScrollView>
   );

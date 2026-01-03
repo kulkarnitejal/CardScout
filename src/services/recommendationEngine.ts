@@ -72,3 +72,46 @@ export const getRecommendationById = (
   return recommendations.find((rec) => rec.id === id);
 };
 
+/**
+ * Generate recommendations from all available gift cards
+ * Used for "All Deals" view where we don't have transaction data
+ */
+export const generateAllDeals = (): Recommendation[] => {
+  const giftCards = getAllGiftCards();
+  const recommendations: Recommendation[] = [];
+  const now = new Date();
+
+  giftCards.forEach((giftCard) => {
+    // Create a minimal merchant object for display purposes
+    const merchant: Merchant = {
+      name: giftCard.merchant,
+      category: giftCard.category || 'Other',
+      totalSpent: 0,
+      transactionCount: 0,
+      averageTransaction: 0,
+      lastTransactionDate: now,
+    };
+
+    // For "All Deals", we don't have spending data, so set to 0
+    recommendations.push({
+      id: giftCard.id,
+      merchant,
+      giftCard,
+      potentialSavings: 0,
+      threeMonthSpending: 0,
+      annualSavings: 0,
+      savingsPercent: giftCard.discountPercent,
+    });
+  });
+
+  // Sort by discount percentage (descending), then by merchant name
+  recommendations.sort((a, b) => {
+    if (b.savingsPercent !== a.savingsPercent) {
+      return b.savingsPercent - a.savingsPercent;
+    }
+    return a.merchant.name.localeCompare(b.merchant.name);
+  });
+
+  return recommendations;
+};
+

@@ -90,7 +90,7 @@ export const RecommendationCard: React.FC<RecommendationCardProps> = ({
           <View style={styles.iconContainer}>
             <MaterialCommunityIcons
               name={iconName}
-              size={48}
+              size={40}
               color={TERRACOTTA}
             />
           </View>
@@ -109,7 +109,7 @@ export const RecommendationCard: React.FC<RecommendationCardProps> = ({
             {onPress && (
               <MaterialCommunityIcons
                 name="chevron-right"
-                size={28}
+                size={24}
                 color={COLORS.textSecondary}
                 style={styles.arrow}
               />
@@ -163,10 +163,9 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: COLORS.secondary,
     borderRadius: 12,
-    padding: 20,
-    marginVertical: 8,
+    padding: 12,
+    marginVertical: 4,
     marginHorizontal: 16,
-    minHeight: 160,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -177,7 +176,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 10,
     flex: 1,
   },
   leftSection: {
@@ -186,13 +185,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   iconContainer: {
-    width: 64,
-    height: 64,
-    borderRadius: 12,
+    width: 48,
+    height: 48,
+    borderRadius: 10,
     backgroundColor: '#fff',
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.05,
@@ -202,14 +201,14 @@ const styles = StyleSheet.create({
   merchantInfo: {
     flex: 1,
     justifyContent: 'center',
-    height: 64, // Match icon container height for perfect alignment
+    height: 48, // Match icon container height for perfect alignment
   },
   merchantName: {
-    fontSize: 24,
+    fontSize: 20,
     fontFamily: FONTS.bold,
     fontWeight: '700',
     color: COLORS.text,
-    lineHeight: 28,
+    lineHeight: 24,
     includeFontPadding: false,
     textAlignVertical: 'center',
   },
@@ -218,16 +217,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: COLORS.background,
-    marginTop: 12,
-    marginBottom: 12,
+    marginTop: 8,
+    marginBottom: 8,
   },
   quarterlySpendingLabel: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: FONTS.medium,
     color: COLORS.textSecondary,
     fontWeight: '500',
@@ -235,33 +234,33 @@ const styles = StyleSheet.create({
     letterSpacing: 0.5,
   },
   quarterlySpendingValue: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: FONTS.bold,
     color: COLORS.text,
     fontWeight: '700',
   },
   rightSection: {
     alignItems: 'center',
-    marginLeft: 12,
+    marginLeft: 8,
     justifyContent: 'center',
-    height: 64, // Match icon container height for perfect alignment
+    height: 48, // Match icon container height for perfect alignment
   },
   rightContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 6,
   },
   discountBadge: {
     backgroundColor: TERRACOTTA,
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 24,
-    minWidth: 80,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    minWidth: 70,
     alignItems: 'center',
   },
   discountText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 13,
     fontFamily: FONTS.bold,
     fontWeight: '700',
   },
@@ -273,15 +272,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#fff',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
     borderRadius: 8,
     borderWidth: 1,
     borderColor: COLORS.background,
-    marginBottom: 12,
+    marginBottom: 8,
   },
   giftCardLabel: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: FONTS.medium,
     color: COLORS.textSecondary,
     fontWeight: '500',
@@ -291,37 +290,37 @@ const styles = StyleSheet.create({
   giftCardValues: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
+    gap: 4,
   },
   giftCardPrice: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: FONTS.bold,
     color: TERRACOTTA,
     fontWeight: '700',
   },
   giftCardSeparator: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: FONTS.regular,
     color: COLORS.textSecondary,
   },
   giftCardValue: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: FONTS.semiBold,
     color: COLORS.text,
     fontWeight: '600',
   },
   getCardButton: {
     backgroundColor: LIGHT_GREEN,
-    paddingVertical: 14,
+    paddingVertical: 10,
     paddingHorizontal: 24,
-    borderRadius: 12,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
     width: '100%',
   },
   getCardText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: FONTS.semiBold,
     fontWeight: '600',
   },
