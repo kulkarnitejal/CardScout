@@ -57,16 +57,28 @@ if (__DEV__) {
   console.log('   3. Device/emulator and computer are on same network');
 }
 
+// export const COLORS = {
+//   primary: '#B4654A',
+//   secondary: '#F4FAF2',
+//   background: '#F5F5F5',
+//   surface: '#ffffff',
+//   error: '#b00020',
+//   text: '#000000',
+//   textSecondary: '#757575',
+//   success: '#648767',
+//   warning: '#ff9800',
+// };
+
 export const COLORS = {
-  primary: '#B4654A',
-  secondary: '#F4FAF2',
-  background: '#F5F5F5',
-  surface: '#ffffff',
+  primary: '#648767',
+  secondary: '#F5F5F5',
+  background: '#d1ddd3',
+  surface: '#F5F5F5',
   error: '#b00020',
   text: '#000000',
-  textSecondary: '#757575',
+  textSecondary: '#626262',
   success: '#648767',
-  warning: '#ff9800',
+  warning: '#648767',
 };
 
 // Modern, sleek, and highly readable font

@@ -45,7 +45,6 @@ const BackNavigator: React.FC = () => {
   );
 };
 
-
 const AuthStack = createStackNavigator();
 
 const AuthNavigator: React.FC = () => {
@@ -53,7 +52,7 @@ const AuthNavigator: React.FC = () => {
     <AuthStack.Navigator
       screenOptions={{
         headerStyle: {
-          backgroundColor: COLORS.primary,
+          backgroundColor: COLORS.background,
         },
         headerTintColor: '#fff',
       }}

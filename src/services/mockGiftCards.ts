@@ -138,7 +138,7 @@ export const mockGiftCards: GiftCard[] = [
   {
     id: 'gc_amc_samsclub',
     merchant: 'KFC',
-    discountPercent: 40,
+    discountPercent: 20,
     availableAmount: 50,
     price: 40,
     source: 'Sam\'s Club',

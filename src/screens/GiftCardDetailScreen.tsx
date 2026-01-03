@@ -123,15 +123,15 @@ export const GiftCardDetailScreen: React.FC = () => {
           </View>
 
           <View style={styles.infoContainer}>
-            <Text style={styles.infoLabel}>Source</Text>
-            <Text style={styles.infoValue}>{recommendation.giftCard.source}</Text>
-          </View>
-
-          <View style={styles.infoContainer}>
             <Text style={styles.infoLabel}>Discount</Text>
             <Text style={styles.infoValue}>
               {formatPercent(recommendation.giftCard.discountPercent)}
             </Text>
+          </View>
+
+          <View style={styles.savingsContainerLast}>
+            <Text style={styles.infoLabel}>Source</Text>
+            <Text style={styles.infoValue}>{recommendation.giftCard.source}</Text>
           </View>
 
           <TouchableOpacity 
@@ -168,16 +168,16 @@ export const GiftCardDetailScreen: React.FC = () => {
             </Text>
           </View>
 
-          <View style={styles.divider} />
+          {/* <View style={styles.divider} /> */}
 
           <View style={styles.savingsContainer}>
-            <Text style={styles.savingsLabel}>Monthly Savings</Text>
+            <Text style={styles.savingsLabel}>Est. Monthly Savings</Text>
             <Text style={styles.savingsValue}>
               {formatCurrency(recommendation.potentialSavings)}
             </Text>
           </View>
 
-          <View style={styles.savingsContainer}>
+          <View style={styles.savingsContainerLast}>
             <Text style={styles.savingsLabel}>Projected Annual Savings</Text>
             <Text style={styles.annualSavingsValue}>
               {formatCurrency(recommendation.annualSavings)}
@@ -195,7 +195,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.background,
   },
   header: {
-    backgroundColor: COLORS.secondary,
+    backgroundColor: COLORS.background,
     padding: 20,
     paddingTop: 16,
     flexDirection: 'row',
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 12,
-    borderBottomWidth: 1,
+    borderBottomWidth: .5,
     borderBottomColor: COLORS.background,
   },
   infoLabel: {
@@ -324,8 +324,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 12,
-    borderBottomWidth: 1,
+    borderBottomWidth: .5,
     borderBottomColor: COLORS.background,
+  },
+  savingsContainerLast: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 8,
   },
   savingsLabel: {
     fontSize: 14,

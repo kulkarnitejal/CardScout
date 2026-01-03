@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   ScrollView,
   Alert,
   Linking,
+  Animated,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { COLORS, FONTS } from '../utils/constants';
@@ -24,6 +25,30 @@ interface MenuModalProps {
 export const MenuModal: React.FC<MenuModalProps> = ({ visible, onClose }) => {
   const insets = useSafeAreaInsets();
   const { user, signOut } = useAuth();
+  const slideAnim = useRef(new Animated.Value(-280)).current; // Start off-screen to the left
+  const [modalVisible, setModalVisible] = useState(visible);
+
+  useEffect(() => {
+    if (visible) {
+      // Show modal and reset animation position, then slide in from left
+      setModalVisible(true);
+      slideAnim.setValue(-280);
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      // Slide out to left, then hide modal after animation completes
+      Animated.timing(slideAnim, {
+        toValue: -280,
+        duration: 300,
+        useNativeDriver: true,
+      }).start(() => {
+        setModalVisible(false);
+      });
+    }
+  }, [visible, slideAnim]);
 
   const handleSignOut = async () => {
     Alert.alert(
@@ -81,15 +106,23 @@ export const MenuModal: React.FC<MenuModalProps> = ({ visible, onClose }) => {
 
   return (
     <Modal
-      visible={visible}
+      visible={modalVisible}
       transparent={true}
-      animationType="slide"
+      animationType="none"
       onRequestClose={onClose}
     >
       <TouchableWithoutFeedback onPress={onClose}>
         <View style={styles.overlay}>
           <TouchableWithoutFeedback>
-            <View style={[styles.drawer, { paddingTop: insets.top }]}>
+            <Animated.View
+              style={[
+                styles.drawer,
+                { paddingTop: insets.top },
+                {
+                  transform: [{ translateX: slideAnim }],
+                },
+              ]}
+            >
               <View style={styles.header}>
                 <Text style={styles.headerTitle}>Menu</Text>
                 <TouchableOpacity onPress={onClose} style={styles.closeButton}>
@@ -139,7 +172,7 @@ export const MenuModal: React.FC<MenuModalProps> = ({ visible, onClose }) => {
                   />
                 </TouchableOpacity>
               </ScrollView>
-            </View>
+            </Animated.View>
           </TouchableWithoutFeedback>
         </View>
       </TouchableWithoutFeedback>
