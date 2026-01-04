@@ -175,6 +175,40 @@ export type Database = {
           iso_currency_code?: string | null;
         };
       };
+      gift_cards: {
+        Row: {
+          id: string;
+          merchant: string;
+          discount_percent: number;
+          available_amount: number;
+          price: number;
+          source: string;
+          category: string | null;
+          is_active: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          merchant: string;
+          discount_percent: number;
+          available_amount: number;
+          price: number;
+          source: string;
+          category?: string | null;
+          is_active?: boolean;
+        };
+        Update: {
+          id?: string;
+          merchant?: string;
+          discount_percent?: number;
+          available_amount?: number;
+          price?: number;
+          source?: string;
+          category?: string | null;
+          is_active?: boolean;
+        };
+      };
     };
   };
 };

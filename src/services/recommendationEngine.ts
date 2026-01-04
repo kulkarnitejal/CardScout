@@ -1,6 +1,19 @@
 import { Merchant, GiftCard, Recommendation, Transaction } from '../types';
-import { getAllGiftCards, getGiftCardByMerchant } from './mockGiftCards';
+import { getAllGiftCards, getGiftCardByMerchant } from './supabaseService';
 import { calculateThreeMonthSpending } from './merchantAnalyzer';
+
+// Helper to convert Supabase gift card format to our GiftCard type
+const convertSupabaseGiftCard = (supabaseCard: any): GiftCard => {
+  return {
+    id: supabaseCard.id,
+    merchant: supabaseCard.merchant,
+    discountPercent: supabaseCard.discount_percent,
+    availableAmount: supabaseCard.available_amount,
+    price: supabaseCard.price,
+    source: supabaseCard.source,
+    category: supabaseCard.category || undefined,
+  };
+};
 
 const fuzzyMatchMerchant = (merchantName: string, giftCardMerchant: string): boolean => {
   const normalizedMerchant = merchantName.toLowerCase().trim();
@@ -19,16 +32,26 @@ const fuzzyMatchMerchant = (merchantName: string, giftCardMerchant: string): boo
   return false;
 };
 
-export const generateRecommendations = (
+export const generateRecommendations = async (
   merchants: Merchant[],
   transactions: Transaction[]
-): Recommendation[] => {
+): Promise<Recommendation[]> => {
   const recommendations: Recommendation[] = [];
-  const giftCards = getAllGiftCards();
+  
+  // Fetch all gift cards from Supabase
+  const { data: supabaseGiftCards, error } = await getAllGiftCards();
+  
+  if (error || !supabaseGiftCards) {
+    console.error('Error fetching gift cards from Supabase:', error);
+    return []; // Return empty array if fetch fails
+  }
 
-  merchants.forEach((merchant) => {
+  const giftCards = supabaseGiftCards.map(convertSupabaseGiftCard);
+
+  for (const merchant of merchants) {
     // Try exact match first
-    let giftCard = getGiftCardByMerchant(merchant.name);
+    const { data: exactMatch } = await getGiftCardByMerchant(merchant.name);
+    let giftCard: GiftCard | undefined = exactMatch ? convertSupabaseGiftCard(exactMatch) : undefined;
     
     // If no exact match, try fuzzy matching
     if (!giftCard) {
@@ -36,7 +59,7 @@ export const generateRecommendations = (
     }
 
     if (!giftCard) {
-      return; // No matching gift card found
+      continue; // No matching gift card found
     }
 
     // Calculate 3-month spending
@@ -56,13 +79,13 @@ export const generateRecommendations = (
       annualSavings,
       savingsPercent: giftCard.discountPercent,
     });
-  });
+  }
 
   // Sort by annual savings (descending)
   recommendations.sort((a, b) => b.annualSavings - a.annualSavings);
 
   // Return top recommendations
-  return recommendations.slice();
+  return recommendations;
 };
 
 export const getRecommendationById = (
@@ -76,8 +99,15 @@ export const getRecommendationById = (
  * Generate recommendations from all available gift cards
  * Used for "All Deals" view where we don't have transaction data
  */
-export const generateAllDeals = (): Recommendation[] => {
-  const giftCards = getAllGiftCards();
+export const generateAllDeals = async (): Promise<Recommendation[]> => {
+  const { data: supabaseGiftCards, error } = await getAllGiftCards();
+  
+  if (error || !supabaseGiftCards) {
+    console.error('Error fetching gift cards from Supabase:', error);
+    return []; // Return empty array if fetch fails
+  }
+
+  const giftCards = supabaseGiftCards.map(convertSupabaseGiftCard);
   const recommendations: Recommendation[] = [];
   const now = new Date();
 

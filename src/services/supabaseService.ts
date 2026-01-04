@@ -7,6 +7,8 @@ type Account = Database['public']['Tables']['accounts']['Row'];
 type AccountInsert = Database['public']['Tables']['accounts']['Insert'];
 type Transaction = Database['public']['Tables']['transactions']['Row'];
 type TransactionInsert = Database['public']['Tables']['transactions']['Insert'];
+type GiftCard = Database['public']['Tables']['gift_cards']['Row'];
+type GiftCardInsert = Database['public']['Tables']['gift_cards']['Insert'];
 
 // ============================================
 // Authentication
@@ -198,6 +200,91 @@ export const deleteTransactions = async (plaidItemId: string) => {
     .from('transactions')
     .delete()
     .eq('plaid_item_id', plaidItemId);
+  return { error };
+};
+
+// ============================================
+// Gift Cards
+// ============================================
+
+export const getAllGiftCards = async (options?: { activeOnly?: boolean }) => {
+  let query = supabase
+    .from('gift_cards')
+    .select('*')
+    .order('discount_percent', { ascending: false });
+
+  if (options?.activeOnly !== false) {
+    query = query.eq('is_active', true);
+  }
+
+  const { data, error } = await query;
+  return { data, error };
+};
+
+export const getGiftCardById = async (id: string) => {
+  const { data, error } = await supabase
+    .from('gift_cards')
+    .select('*')
+    .eq('id', id)
+    .eq('is_active', true)
+    .single();
+  return { data, error };
+};
+
+export const getGiftCardByMerchant = async (merchantName: string) => {
+  // Fetch gift cards and do exact match (case-insensitive) in memory
+  // This is simpler and works well since we need to do fuzzy matching anyway
+  const { data: allCards, error } = await getAllGiftCards({ activeOnly: true });
+  
+  if (error || !allCards) {
+    return { data: null, error };
+  }
+  
+  // Find exact match (case-insensitive)
+  const normalizedName = merchantName.toLowerCase().trim();
+  const exactMatch = allCards.find(
+    (card) => card.merchant.toLowerCase().trim() === normalizedName
+  );
+  
+  if (exactMatch) {
+    return { data: exactMatch, error: null };
+  }
+  
+  return { data: null, error: null };
+};
+
+export const createGiftCard = async (giftCard: GiftCardInsert) => {
+  const { data, error } = await supabase
+    .from('gift_cards')
+    .insert(giftCard)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const upsertGiftCards = async (giftCards: GiftCardInsert[]) => {
+  const { data, error } = await supabase
+    .from('gift_cards')
+    .upsert(giftCards, { onConflict: 'id' })
+    .select();
+  return { data, error };
+};
+
+export const updateGiftCard = async (id: string, updates: Partial<GiftCardInsert>) => {
+  const { data, error } = await supabase
+    .from('gift_cards')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+  return { data, error };
+};
+
+export const deleteGiftCard = async (id: string) => {
+  const { error } = await supabase
+    .from('gift_cards')
+    .delete()
+    .eq('id', id);
   return { error };
 };
 

@@ -44,9 +44,19 @@ export const RecommendationsScreen: React.FC = () => {
 
   useEffect(() => {
     loadData();
-    // Load all deals immediately (no async needed)
-    setAllDeals(generateAllDeals());
+    // Load all deals from Supabase
+    loadAllDeals();
   }, []);
+
+  const loadAllDeals = async () => {
+    try {
+      const deals = await generateAllDeals();
+      setAllDeals(deals);
+    } catch (error) {
+      console.error('Error loading all deals:', error);
+      setAllDeals([]);
+    }
+  };
 
   const loadData = async () => {
     try {
@@ -94,7 +104,7 @@ export const RecommendationsScreen: React.FC = () => {
 
       // Generate recommendations from real transactions
       const merchants = analyzeMerchants(transactions);
-      const recs = generateRecommendations(merchants, transactions);
+      const recs = await generateRecommendations(merchants, transactions);
       setPersonalizedRecommendations(recs);
     } catch (error) {
       console.error('Error loading recommendations:', error);
