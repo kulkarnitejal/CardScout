@@ -162,40 +162,6 @@ export const RecommendationsScreen: React.FC = () => {
         <View style={styles.menuButtonPlaceholder} />
       </View>
 
-      <View style={styles.headerControls}>
-        <View style={styles.segmentedControlContainer}>
-          <SegmentedControl
-            segments={['For You', 'All Deals']}
-            selectedIndex={selectedSegment}
-            onSegmentChange={setSelectedSegment}
-          />
-        </View>
-        <TouchableOpacity
-          onPress={() => {
-            setSearchVisible(!searchVisible);
-            if (searchVisible) {
-              setSearchQuery(''); // Clear search when closing
-            }
-          }}
-          style={styles.searchIconButton}
-          activeOpacity={0.7}
-        >
-          <MaterialCommunityIcons 
-            name={searchVisible ? "close" : "magnify"} 
-            size={24} 
-            color={COLORS.text} 
-          />
-        </TouchableOpacity>
-      </View>
-
-      {searchVisible && (
-        <SearchBar
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-          placeholder="Search merchants..."
-        />
-      )}
-
       <FlatList
         data={currentRecommendations}
         keyExtractor={(item) => item.id}
@@ -214,6 +180,44 @@ export const RecommendationsScreen: React.FC = () => {
             onRefresh={onRefresh}
             enabled={selectedSegment === 0} // Only refresh for "For You" view
           />
+        }
+        ListHeaderComponent={
+          <View>
+            <View style={styles.headerControls}>
+              <View style={styles.segmentedControlContainer}>
+                <SegmentedControl
+                  segments={['For You', 'All Deals']}
+                  selectedIndex={selectedSegment}
+                  onSegmentChange={setSelectedSegment}
+                />
+              </View>
+              <TouchableOpacity
+                onPress={() => {
+                  setSearchVisible(!searchVisible);
+                  if (searchVisible) {
+                    setSearchQuery(''); // Clear search when closing
+                  }
+                }}
+                style={styles.searchIconButton}
+                activeOpacity={0.7}
+              >
+                <MaterialCommunityIcons 
+                  name={searchVisible ? "close" : "magnify"} 
+                  size={24} 
+                  color={COLORS.text} 
+                />
+              </TouchableOpacity>
+            </View>
+
+            {searchVisible && (
+              <SearchBar
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                placeholder="Search merchants..."
+              />
+            )}
+
+          </View>
         }
     
         ListEmptyComponent={

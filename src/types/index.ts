@@ -22,6 +22,7 @@ export interface GiftCard {
   availableAmount: number;
   price: number;
   source: string;
+  sourceLink?: string;
   category?: string;
 }
 

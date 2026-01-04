@@ -24,3 +24,14 @@ export const formatPercent = (value: number): string => {
   return `${value.toFixed(0)}%`;
 };
 
+/**
+ * Calculate discount percent from available amount and price
+ * Formula: (availableAmount - price) / availableAmount * 100
+ */
+export const calculateDiscountPercent = (availableAmount: number, price: number): number => {
+  if (availableAmount <= 0) {
+    return 0;
+  }
+  return Math.round(((availableAmount - price) / availableAmount) * 100 * 100) / 100;
+};
+

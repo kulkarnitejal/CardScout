@@ -1,5 +1,6 @@
 import { supabase } from '../config/supabase';
 import type { Database } from '../config/supabase';
+import { calculateDiscountPercent } from '../utils/formatters';
 
 type PlaidItem = Database['public']['Tables']['plaid_items']['Row'];
 type PlaidItemInsert = Database['public']['Tables']['plaid_items']['Insert'];
@@ -210,8 +211,7 @@ export const deleteTransactions = async (plaidItemId: string) => {
 export const getAllGiftCards = async (options?: { activeOnly?: boolean }) => {
   let query = supabase
     .from('gift_cards')
-    .select('*')
-    .order('discount_percent', { ascending: false });
+    .select('*');
 
   if (options?.activeOnly !== false) {
     query = query.eq('is_active', true);
@@ -240,17 +240,27 @@ export const getGiftCardByMerchant = async (merchantName: string) => {
     return { data: null, error };
   }
   
-  // Find exact match (case-insensitive)
+  // Find all exact matches (case-insensitive) - there may be multiple sources
   const normalizedName = merchantName.toLowerCase().trim();
-  const exactMatch = allCards.find(
+  const matches = allCards.filter(
     (card) => card.merchant.toLowerCase().trim() === normalizedName
   );
   
-  if (exactMatch) {
-    return { data: exactMatch, error: null };
+  if (matches.length === 0) {
+    return { data: null, error: null };
   }
   
-  return { data: null, error: null };
+  // If multiple matches, return the one with the highest discount
+  // Calculate discount for each and sort by discount (highest first)
+  const matchesWithDiscount = matches.map((card) => {
+    const discountPercent = calculateDiscountPercent(card.available_amount, card.price);
+    return { card, discountPercent };
+  });
+  
+  matchesWithDiscount.sort((a, b) => b.discountPercent - a.discountPercent);
+  
+  // Return the best deal (highest discount)
+  return { data: matchesWithDiscount[0].card, error: null };
 };
 
 export const createGiftCard = async (giftCard: GiftCardInsert) => {

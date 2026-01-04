@@ -34,10 +34,10 @@ async function migrateGiftCards() {
   console.log(`📦 Migrating ${mockGiftCards.length} gift cards to Supabase\n`);
 
   // Transform mock data to match Supabase schema
+  // Note: discount_percent is no longer stored - it's calculated from available_amount and price
   const giftCardsToInsert = mockGiftCards.map((card) => ({
     id: card.id,
     merchant: card.merchant,
-    discount_percent: card.discountPercent,
     available_amount: card.availableAmount,
     price: card.price,
     source: card.source,
@@ -63,7 +63,7 @@ async function migrateGiftCards() {
   // Verify the migration
   const { data: verifyData, error: verifyError } = await supabase
     .from('gift_cards')
-    .select('id, merchant, discount_percent, is_active')
+    .select('id, merchant, available_amount, price, is_active')
     .eq('is_active', true);
 
   if (verifyError) {
@@ -72,7 +72,8 @@ async function migrateGiftCards() {
     console.log(`✅ Verification: Found ${verifyData?.length || 0} active gift cards in database\n`);
     console.log('Sample gift cards:');
     verifyData?.slice(0, 5).forEach((card) => {
-      console.log(`  - ${card.merchant} (${card.discount_percent}% off)`);
+      const discountPercent = Math.round(((card.available_amount - card.price) / card.available_amount) * 100);
+      console.log(`  - ${card.merchant} (${discountPercent}% off)`);
     });
   }
 

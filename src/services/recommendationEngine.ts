@@ -1,16 +1,24 @@
 import { Merchant, GiftCard, Recommendation, Transaction } from '../types';
 import { getAllGiftCards, getGiftCardByMerchant } from './supabaseService';
 import { calculateThreeMonthSpending } from './merchantAnalyzer';
+import { calculateDiscountPercent } from '../utils/formatters';
 
 // Helper to convert Supabase gift card format to our GiftCard type
 const convertSupabaseGiftCard = (supabaseCard: any): GiftCard => {
+  // Calculate discount percent from available amount and price
+  const discountPercent = calculateDiscountPercent(
+    supabaseCard.available_amount,
+    supabaseCard.price
+  );
+
   return {
     id: supabaseCard.id,
     merchant: supabaseCard.merchant,
-    discountPercent: supabaseCard.discount_percent,
+    discountPercent,
     availableAmount: supabaseCard.available_amount,
     price: supabaseCard.price,
     source: supabaseCard.source,
+    sourceLink: supabaseCard.source_link || undefined,
     category: supabaseCard.category || undefined,
   };
 };
@@ -49,13 +57,19 @@ export const generateRecommendations = async (
   const giftCards = supabaseGiftCards.map(convertSupabaseGiftCard);
 
   for (const merchant of merchants) {
-    // Try exact match first
+    // Try exact match first - this now returns the best deal if multiple exist
     const { data: exactMatch } = await getGiftCardByMerchant(merchant.name);
     let giftCard: GiftCard | undefined = exactMatch ? convertSupabaseGiftCard(exactMatch) : undefined;
     
     // If no exact match, try fuzzy matching
     if (!giftCard) {
-      giftCard = giftCards.find((gc) => fuzzyMatchMerchant(merchant.name, gc.merchant));
+      const fuzzyMatches = giftCards.filter((gc) => fuzzyMatchMerchant(merchant.name, gc.merchant));
+      
+      // If multiple fuzzy matches, pick the one with highest discount
+      if (fuzzyMatches.length > 0) {
+        fuzzyMatches.sort((a, b) => b.discountPercent - a.discountPercent);
+        giftCard = fuzzyMatches[0];
+      }
     }
 
     if (!giftCard) {

@@ -11,11 +11,10 @@ interface RecommendationCardProps {
   onPress?: () => void;
 }
 
-// Map gift card sources to their website URLs
-const getSourceUrl = (source: string, merchant: string): string => {
-  const sourceMap: { [key: string]: string } = {
-    'Sam\'s Club': 'https://www.samsclub.com/browse/Gift-Cards/1003',
-    'Costco': 'https://www.costco.com/gift-cards-tickets.html'
+// Get source URL from gift card, with fallback to Google search
+const getSourceUrl = (giftCard: { sourceLink?: string; source: string; merchant: string }): string => {
+  if (giftCard.sourceLink) {
+    return giftCard.sourceLink;
   }
   
   const baseUrl = sourceMap[source] || 'https://www.google.com/search?q=' + encodeURIComponent(`${merchant} gift card`);
@@ -69,7 +68,7 @@ export const RecommendationCard: React.FC<RecommendationCardProps> = ({
   onPress,
 }) => {
   const handleGetCard = async () => {
-    const url = getSourceUrl(recommendation.giftCard.source, recommendation.merchant.name);
+    const url = getSourceUrl(recommendation.giftCard);
     try {
       const supported = await Linking.canOpenURL(url);
       if (supported) {

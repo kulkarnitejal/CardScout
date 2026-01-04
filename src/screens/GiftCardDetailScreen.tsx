@@ -7,15 +7,13 @@ import { COLORS, FONTS } from '../utils/constants';
 // @ts-ignore - @expo/vector-icons is available in Expo
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-// Map gift card sources to their website URLs
-const getSourceUrl = (source: string, merchant: string): string => {
-  const sourceMap: { [key: string]: string } = {
-    'Sam\'s Club': 'https://www.samsclub.com/browse/Gift-Cards/1003',
-    'Costco': 'https://www.costco.com/gift-cards-tickets.html'
-  };
-  
-  const baseUrl = sourceMap[source] || 'https://www.google.com/search?q=' + encodeURIComponent(`${merchant} gift card`);
-  return baseUrl;
+// Get source URL from gift card, with fallback to Google search
+const getSourceUrl = (giftCard: { sourceLink?: string; source: string; merchant: string }): string => {
+  if (giftCard.sourceLink) {
+    return giftCard.sourceLink;
+  }
+  // Fallback to Google search if source_link is not available
+  return 'https://www.google.com/search?q=' + encodeURIComponent(`${giftCard.merchant} gift card`);
 };
 
 // Get icon name based on category
@@ -68,7 +66,7 @@ export const GiftCardDetailScreen: React.FC = () => {
   const { recommendation } = route.params;
 
   const handleGetCard = async () => {
-    const url = getSourceUrl(recommendation.giftCard.source, recommendation.merchant.name);
+    const url = getSourceUrl(recommendation.giftCard);
     try {
       const supported = await Linking.canOpenURL(url);
       if (supported) {

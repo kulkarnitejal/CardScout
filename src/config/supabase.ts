@@ -179,10 +179,10 @@ export type Database = {
         Row: {
           id: string;
           merchant: string;
-          discount_percent: number;
           available_amount: number;
           price: number;
           source: string;
+          source_link: string | null;
           category: string | null;
           is_active: boolean;
           created_at: string;
@@ -191,20 +191,20 @@ export type Database = {
         Insert: {
           id?: string;
           merchant: string;
-          discount_percent: number;
           available_amount: number;
           price: number;
           source: string;
+          source_link?: string | null;
           category?: string | null;
           is_active?: boolean;
         };
         Update: {
           id?: string;
           merchant?: string;
-          discount_percent?: number;
           available_amount?: number;
           price?: number;
           source?: string;
+          source_link?: string | null;
           category?: string | null;
           is_active?: boolean;
         };
