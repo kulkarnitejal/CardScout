@@ -116,11 +116,11 @@ export const RecommendationsScreen: React.FC = () => {
       return recs;
     }
     const query = searchQuery.toLowerCase().trim();
-    return recs.filter((rec) =>
-      rec.merchant.name.toLowerCase().includes(query) ||
-      rec.merchant.category.toLowerCase().includes(query) ||
-      rec.giftCard.source.toLowerCase().includes(query)
-    );
+    return recs.filter((rec) => {
+      const merchantName = rec.merchant.name.toLowerCase();
+      // Only match if the query is actually contained in the merchant name
+      return merchantName.includes(query);
+    });
   };
 
   // Get current recommendations based on selected segment
@@ -183,7 +183,6 @@ export const RecommendationsScreen: React.FC = () => {
           value={searchQuery}
           onChangeText={setSearchQuery}
           placeholder="Search merchants..."
-          resultCount={currentRecommendations.length}
         />
       )}
 

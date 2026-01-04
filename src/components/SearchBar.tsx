@@ -8,14 +8,12 @@ interface SearchBarProps {
   value: string;
   onChangeText: (text: string) => void;
   placeholder?: string;
-  resultCount?: number;
 }
 
 export const SearchBar: React.FC<SearchBarProps> = ({
   value,
   onChangeText,
   placeholder = 'Search merchants...',
-  resultCount,
 }) => {
   const handleClear = () => {
     onChangeText('');
@@ -53,11 +51,6 @@ export const SearchBar: React.FC<SearchBarProps> = ({
           </TouchableOpacity>
         )}
       </View>
-      {value.length > 0 && resultCount !== undefined && (
-        <Text style={styles.resultCount}>
-          {resultCount} {resultCount === 1 ? 'result' : 'results'}
-        </Text>
-      )}
     </View>
   );
 };
@@ -76,6 +69,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderWidth: 1,
     borderColor: COLORS.background,
+    minHeight: 44, // Fixed height to prevent resizing
   },
   searchIcon: {
     marginRight: 8,
@@ -86,17 +80,11 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.regular,
     color: COLORS.text,
     padding: 0,
+    minHeight: 20, // Ensure consistent height
   },
   clearButton: {
     marginLeft: 8,
     padding: 4,
-  },
-  resultCount: {
-    fontSize: 12,
-    fontFamily: FONTS.regular,
-    color: COLORS.textSecondary,
-    marginTop: 4,
-    marginLeft: 4,
   },
 });
 
