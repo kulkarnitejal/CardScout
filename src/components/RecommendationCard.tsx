@@ -90,7 +90,7 @@ export const RecommendationCard: React.FC<RecommendationCardProps> = ({
           <View style={styles.iconContainer}>
             <MaterialCommunityIcons
               name={iconName}
-              size={40}
+              size={36}
               color={TERRACOTTA}
             />
           </View>
@@ -166,6 +166,7 @@ const styles = StyleSheet.create({
     padding: 12,
     marginVertical: 4,
     marginHorizontal: 16,
+    minHeight: 120,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
@@ -176,7 +177,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 8,
     flex: 1,
   },
   leftSection: {
@@ -222,8 +223,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 1,
     borderColor: COLORS.background,
-    marginTop: 8,
-    marginBottom: 8,
+    marginTop: 6,
+    marginBottom: 6,
   },
   quarterlySpendingLabel: {
     fontSize: 10,
@@ -260,7 +261,7 @@ const styles = StyleSheet.create({
   },
   discountText: {
     color: '#fff',
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: FONTS.bold,
     fontWeight: '700',
   },

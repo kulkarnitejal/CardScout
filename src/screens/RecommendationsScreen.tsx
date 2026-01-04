@@ -35,6 +35,7 @@ export const RecommendationsScreen: React.FC = () => {
   const navigation = useNavigation<RecommendationsScreenNavigationProp>();
   const [selectedSegment, setSelectedSegment] = useState(0); // 0 = "For You", 1 = "All Deals"
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchVisible, setSearchVisible] = useState(false);
   const [personalizedRecommendations, setPersonalizedRecommendations] = useState<Recommendation[]>([]);
   const [allDeals, setAllDeals] = useState<Recommendation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -147,22 +148,44 @@ export const RecommendationsScreen: React.FC = () => {
         >
           <MaterialCommunityIcons name="menu" size={24} color="#fff" />
         </TouchableOpacity>
-        <Text style={styles.title}>All Current Deals</Text>
+        <Text style={styles.title}>Deals</Text>
         <View style={styles.menuButtonPlaceholder} />
       </View>
 
-      <SegmentedControl
-        segments={['For You', 'All Deals']}
-        selectedIndex={selectedSegment}
-        onSegmentChange={setSelectedSegment}
-      />
+      <View style={styles.headerControls}>
+        <View style={styles.segmentedControlContainer}>
+          <SegmentedControl
+            segments={['For You', 'All Deals']}
+            selectedIndex={selectedSegment}
+            onSegmentChange={setSelectedSegment}
+          />
+        </View>
+        <TouchableOpacity
+          onPress={() => {
+            setSearchVisible(!searchVisible);
+            if (searchVisible) {
+              setSearchQuery(''); // Clear search when closing
+            }
+          }}
+          style={styles.searchIconButton}
+          activeOpacity={0.7}
+        >
+          <MaterialCommunityIcons 
+            name={searchVisible ? "close" : "magnify"} 
+            size={24} 
+            color={COLORS.text} 
+          />
+        </TouchableOpacity>
+      </View>
 
-      <SearchBar
-        value={searchQuery}
-        onChangeText={setSearchQuery}
-        placeholder="Search merchants..."
-        resultCount={currentRecommendations.length}
-      />
+      {searchVisible && (
+        <SearchBar
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          placeholder="Search merchants..."
+          resultCount={currentRecommendations.length}
+        />
+      )}
 
       <FlatList
         data={currentRecommendations}
@@ -215,7 +238,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: COLORS.primary,
-    padding: 16,
+    padding: 2,
     paddingTop: 60,
     flexDirection: 'row',
     alignItems: 'center',
@@ -223,19 +246,35 @@ const styles = StyleSheet.create({
   },
   menuButton: {
     padding: 8,
-    marginLeft: -8,
+    marginLeft: 4,
   },
   menuButtonPlaceholder: {
-    width: 40,
+    width: 50,
   },
   title: {
-    fontSize: 32,
+    fontSize: 24,
     fontFamily: FONTS.bold,
     fontWeight: '700',
     color: '#fff',
     marginBottom: 4,
     flex: 1,
     textAlign: 'center',
+  },
+  headerControls: {
+    backgroundColor: COLORS.background,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingBottom: 8,
+    paddingTop: 8,
+  },
+  segmentedControlContainer: {
+    flex: 1,
+  },
+  searchIconButton: {
+    padding: 8,
+    marginLeft: 8,
   },
   subtitle: {
     fontSize: 16,

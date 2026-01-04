@@ -293,12 +293,7 @@ export const PlaidConnectScreen: React.FC = () => {
             >
               <MaterialCommunityIcons name="menu" size={24} color="#fff" />
             </TouchableOpacity>
-            <View style={styles.headerTextContainer}>
-              <Text style={styles.title}>Transactions</Text>
-              <Text style={styles.subtitle}>
-                Connect your bank to view transactions
-              </Text>
-            </View>
+            <Text style={styles.title}>Transactions</Text>
             <View style={styles.menuButtonPlaceholder} />
           </View>
 
@@ -352,12 +347,7 @@ export const PlaidConnectScreen: React.FC = () => {
             >
               <MaterialCommunityIcons name="menu" size={24} color="#fff" />
             </TouchableOpacity>
-            <View style={styles.headerTextContainer}>
-              <Text style={styles.title}>Transactions</Text>
-              <Text style={styles.subtitle}>
-                {transactions.length} total transactions
-              </Text>
-            </View>
+            <Text style={styles.title}>Transactions</Text>
             <View style={styles.menuButtonPlaceholder} />
           </View>
 
@@ -400,7 +390,7 @@ const styles = StyleSheet.create({
   },
   header: {
     backgroundColor: COLORS.primary,
-    padding: 24,
+    padding: 2,
     paddingTop: 60,
     flexDirection: 'row',
     alignItems: 'center',
@@ -408,21 +398,23 @@ const styles = StyleSheet.create({
   },
   menuButton: {
     padding: 8,
-    marginLeft: -8,
+    marginLeft: 4,
   },
   menuButtonPlaceholder: {
-    width: 40,
+    width: 50,
   },
   headerTextContainer: {
     flex: 1,
     alignItems: 'center',
   },
   title: {
-    fontSize: 32,
+    fontSize: 24,
     fontFamily: FONTS.bold,
     fontWeight: '700',
     color: '#fff',
     marginBottom: 4,
+    flex: 1,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,

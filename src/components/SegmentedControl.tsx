@@ -47,11 +47,10 @@ export const SegmentedControl: React.FC<SegmentedControlProps> = ({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: COLORS.background,
+    backgroundColor: COLORS.surface, // Use surface color for better contrast
     borderRadius: 8,
     padding: 4,
-    marginHorizontal: 16,
-    marginVertical: 12,
+    marginVertical: 0, // Remove vertical margin since parent handles spacing
   },
   segment: {
     flex: 1,
@@ -76,7 +75,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: FONTS.medium,
     fontWeight: '500',
-    color: COLORS.textSecondary,
+    color: COLORS.text, // Use primary text color for better visibility
   },
   segmentTextSelected: {
     fontFamily: FONTS.semiBold,
