@@ -8,6 +8,7 @@ import { GiftCardDetailScreen } from '../screens/GiftCardDetailScreen';
 import { PlaidConnectScreen } from '../screens/PlaidConnectScreen';
 import { LoginScreen } from '../screens/LoginScreen';
 import { SignupScreen } from '../screens/SignupScreen';
+import { PrivacyPolicyScreen } from '../screens/PrivacyPolicyScreen';
 import { BottomTabBar } from '../components/BottomTabBar';
 import { COLORS } from '../utils/constants';
 import { useAuth } from '../contexts/AuthContext';
@@ -20,6 +21,7 @@ export type RootStackParamList = {
   Back: { screen?: keyof BackParamList } | undefined;
   Transactions: undefined;
   GiftCardDetail: { recommendation: any };
+  PrivacyPolicy: undefined;
 };
 
 export type BackParamList = {
@@ -114,6 +116,13 @@ export const AppNavigator: React.FC = () => {
           component={GiftCardDetailScreen}
           options={{
             title: 'Gift Card Details',
+          }}
+        />
+        <Stack.Screen
+          name="PrivacyPolicy"
+          component={PrivacyPolicyScreen}
+          options={{
+            headerShown: false,
           }}
         />
           </>

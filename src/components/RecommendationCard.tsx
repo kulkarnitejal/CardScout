@@ -16,9 +16,8 @@ const getSourceUrl = (giftCard: { sourceLink?: string; source: string; merchant:
   if (giftCard.sourceLink) {
     return giftCard.sourceLink;
   }
-  
-  const baseUrl = sourceMap[source] || 'https://www.google.com/search?q=' + encodeURIComponent(`${merchant} gift card`);
-  return baseUrl;
+
+  return "";
 };
 
 // Get icon name based on category

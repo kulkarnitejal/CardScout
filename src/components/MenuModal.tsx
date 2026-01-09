@@ -12,10 +12,19 @@ import {
   Animated,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import { CompositeNavigationProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RootStackParamList } from '../navigation/AppNavigator';
 import { COLORS, FONTS } from '../utils/constants';
 import { useAuth } from '../contexts/AuthContext';
 // @ts-ignore - @expo/vector-icons is available in Expo
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+
+type MenuModalNavigationProp = CompositeNavigationProp<
+  any,
+  StackNavigationProp<RootStackParamList>
+>;
 
 interface MenuModalProps {
   visible: boolean;
@@ -24,6 +33,7 @@ interface MenuModalProps {
 
 export const MenuModal: React.FC<MenuModalProps> = ({ visible, onClose }) => {
   const insets = useSafeAreaInsets();
+  const navigation = useNavigation<MenuModalNavigationProp>();
   const { user, signOut } = useAuth();
   const slideAnim = useRef(new Animated.Value(-280)).current; // Start off-screen to the left
   const [modalVisible, setModalVisible] = useState(visible);
@@ -134,6 +144,28 @@ export const MenuModal: React.FC<MenuModalProps> = ({ visible, onClose }) => {
               )}
 
               <ScrollView style={styles.content}>
+                <TouchableOpacity
+                  style={styles.menuItem}
+                  onPress={() => {
+                    navigation.navigate('PrivacyPolicy');
+                    onClose();
+                  }}
+                  activeOpacity={0.7}
+                >
+                  <MaterialCommunityIcons
+                    name="shield-lock"
+                    size={24}
+                    color={COLORS.text}
+                    style={styles.menuIcon}
+                  />
+                  <Text style={styles.menuText}>Privacy Policy</Text>
+                  <MaterialCommunityIcons
+                    name="chevron-right"
+                    size={20}
+                    color={COLORS.textSecondary}
+                  />
+                </TouchableOpacity>
+
                 <TouchableOpacity
                   style={styles.menuItem}
                   onPress={handleReportBug}
