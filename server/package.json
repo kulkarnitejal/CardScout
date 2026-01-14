@@ -1,5 +1,5 @@
 {
-  "name": "giftcardmaxing-server",
+  "name": "cardscout-server",
   "version": "1.0.0",
   "main": "dist/server.js",
   "scripts": {

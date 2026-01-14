@@ -7,7 +7,7 @@ const router = Router();
 router.get('/health', (req, res) => {
   res.json({
     status: 'ok',
-    message: 'GiftCardMaxing API is running',
+    message: 'CardScout API is running',
     timestamp: new Date().toISOString(),
   });
 });

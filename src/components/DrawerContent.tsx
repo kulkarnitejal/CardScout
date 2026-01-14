@@ -44,7 +44,7 @@ export const DrawerContent: React.FC<DrawerContentProps> = ({ navigation }) => {
   };
 
   const handleReportBug = () => {
-    const email = 'support@giftcardmaxing.com'; // Replace with your support email
+    const email = 'support@cardscout.com'; // Replace with your support email
     const subject = encodeURIComponent('Bug Report / Feature Request');
     const body = encodeURIComponent(
       `Please describe the bug or feature request:\n\n` +
@@ -60,7 +60,7 @@ export const DrawerContent: React.FC<DrawerContentProps> = ({ navigation }) => {
         } else {
           Alert.alert(
             'Email Not Available',
-            'Please send an email to support@giftcardmaxing.com',
+            'Please send an email to support@cardscout.com',
             [{ text: 'OK' }]
           );
         }
@@ -68,7 +68,7 @@ export const DrawerContent: React.FC<DrawerContentProps> = ({ navigation }) => {
       .catch(() => {
         Alert.alert(
           'Error',
-          'Unable to open email client. Please send an email to support@giftcardmaxing.com',
+          'Unable to open email client. Please send an email to support@cardscout.com',
           [{ text: 'OK' }]
         );
       });

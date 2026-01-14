@@ -1,6 +1,6 @@
-# GiftCardMaxing Backend Server
+# CardScout Backend Server
 
-Node.js/Express backend server for GiftCardMaxing app with Plaid integration.
+Node.js/Express backend server for CardScout app with Plaid integration.
 
 ## Features
 

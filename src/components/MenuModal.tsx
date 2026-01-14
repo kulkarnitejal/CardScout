@@ -82,7 +82,7 @@ export const MenuModal: React.FC<MenuModalProps> = ({ visible, onClose }) => {
   };
 
   const handleReportBug = () => {
-    const email = 'support@giftcardmaxing.com';
+    const email = 'support@cardscout.com';
     const subject = encodeURIComponent('Bug Report / Feature Request');
     const body = encodeURIComponent(
       `Please describe the bug or feature request:\n\n` +
@@ -98,7 +98,7 @@ export const MenuModal: React.FC<MenuModalProps> = ({ visible, onClose }) => {
         } else {
           Alert.alert(
             'Email Not Available',
-            'Please send an email to support@giftcardmaxing.com',
+            'Please send an email to support@cardscout.com',
             [{ text: 'OK' }]
           );
         }
@@ -106,7 +106,7 @@ export const MenuModal: React.FC<MenuModalProps> = ({ visible, onClose }) => {
       .catch(() => {
         Alert.alert(
           'Error',
-          'Unable to open email client. Please send an email to support@giftcardmaxing.com',
+          'Unable to open email client. Please send an email to support@cardscout.com',
           [{ text: 'OK' }]
         );
       });

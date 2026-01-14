@@ -3,9 +3,9 @@ import { Transaction } from '../types';
 import { generateMockTransactions } from './mockTransactions';
 import { getAllGiftCards } from './mockGiftCards';
 
-const TRANSACTIONS_KEY = '@giftcardmaxing:transactions';
-const PLAID_ACCESS_TOKEN_KEY = '@giftcardmaxing:plaid_access_token';
-const PLAID_ITEM_ID_KEY = '@giftcardmaxing:plaid_item_id';
+const TRANSACTIONS_KEY = '@cardscout:transactions';
+const PLAID_ACCESS_TOKEN_KEY = '@cardscout:plaid_access_token';
+const PLAID_ITEM_ID_KEY = '@cardscout:plaid_item_id';
 
 export const saveTransactions = async (transactions: Transaction[]): Promise<void> => {
   try {

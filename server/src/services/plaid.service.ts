@@ -21,7 +21,7 @@ class PlaidService {
         user: {
           client_user_id: userId,
         },
-        client_name: 'GiftCardMaxing',
+        client_name: 'CardScout',
         products: [Products.Transactions],
         country_codes: [CountryCode.Us],
         language: 'en',
