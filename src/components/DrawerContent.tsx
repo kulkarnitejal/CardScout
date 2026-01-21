@@ -44,7 +44,7 @@ export const DrawerContent: React.FC<DrawerContentProps> = ({ navigation }) => {
   };
 
   const handleReportBug = () => {
-    const email = 'support@cardscout.com'; // Replace with your support email
+    const email = 'kulkarni.tejal1+support@gmail.com'; // Replace with your support email
     const subject = encodeURIComponent('Bug Report / Feature Request');
     const body = encodeURIComponent(
       `Please describe the bug or feature request:\n\n` +
@@ -68,7 +68,7 @@ export const DrawerContent: React.FC<DrawerContentProps> = ({ navigation }) => {
       .catch(() => {
         Alert.alert(
           'Error',
-          'Unable to open email client. Please send an email to support@cardscout.com',
+          'Unable to open email client. Please send an email to kulkarni.tejal1+support@gmail.com',
           [{ text: 'OK' }]
         );
       });
