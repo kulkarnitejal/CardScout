@@ -152,6 +152,7 @@ export const RecommendationsScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <AppHeader
+        title="Deals"
         showLogo={true}
         onMenuPress={() => setMenuVisible(true)}
       />

@@ -287,6 +287,7 @@ export const PlaidConnectScreen: React.FC = () => {
       return (
         <View style={styles.container}>
           <AppHeader
+            title="Transactions"
             showLogo={true}
             onMenuPress={() => setMenuVisible(true)}
           />
@@ -334,6 +335,7 @@ export const PlaidConnectScreen: React.FC = () => {
       return (
         <View style={styles.container}>
           <AppHeader
+            title="Transactions"
             showLogo={true}
             onMenuPress={() => setMenuVisible(true)}
           />

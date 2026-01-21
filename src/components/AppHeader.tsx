@@ -27,11 +27,8 @@ export const AppHeader: React.FC<AppHeaderProps> = ({
       </TouchableOpacity>
       
       <View style={styles.centerContent}>
-        {showLogo ? (
-          <Logo size="small" showText={false} style={styles.logo} />
-        ) : (
-          title && <Text style={styles.title}>{title}</Text>
-        )}
+     
+        {title && <Text style={styles.title}>{title}</Text>}
       </View>
       
       <View style={styles.menuButtonPlaceholder} />

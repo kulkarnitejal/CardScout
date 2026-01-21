@@ -93,6 +93,7 @@ export const TransactionsScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       <AppHeader
+        title="Transactions"
         showLogo={true}
         onMenuPress={() => setMenuVisible(true)}
       />
