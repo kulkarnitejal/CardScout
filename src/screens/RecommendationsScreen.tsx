@@ -23,6 +23,7 @@ import { COLORS, FONTS } from '../utils/constants';
 import { getCurrentUser } from '../services/supabaseService';
 import { getTransactions } from '../services/supabaseService';
 import { MenuModal } from '../components/MenuModal';
+import { AppHeader } from '../components/AppHeader';
 // @ts-ignore - @expo/vector-icons is available in Expo
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -150,17 +151,10 @@ export const RecommendationsScreen: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => setMenuVisible(true)}
-          style={styles.menuButton}
-          activeOpacity={0.7}
-        >
-          <MaterialCommunityIcons name="menu" size={24} color="#fff" />
-        </TouchableOpacity>
-        <Text style={styles.title}>Deals</Text>
-        <View style={styles.menuButtonPlaceholder} />
-      </View>
+      <AppHeader
+        showLogo={true}
+        onMenuPress={() => setMenuVisible(true)}
+      />
 
       <FlatList
         data={currentRecommendations}
@@ -248,30 +242,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
-  },
-  header: {
-    backgroundColor: COLORS.primary,
-    padding: 2,
-    paddingTop: 60,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  menuButton: {
-    padding: 8,
-    marginLeft: 4,
-  },
-  menuButtonPlaceholder: {
-    width: 50,
-  },
-  title: {
-    fontSize: 24,
-    fontFamily: FONTS.bold,
-    fontWeight: '700',
-    color: '#fff',
-    marginBottom: 4,
-    flex: 1,
-    textAlign: 'center',
   },
   headerControls: {
     backgroundColor: COLORS.background,

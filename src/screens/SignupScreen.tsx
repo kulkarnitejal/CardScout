@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import { COLORS, FONTS } from '../utils/constants';
+import { Logo } from '../components/Logo';
 
 export const SignupScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -62,6 +63,7 @@ export const SignupScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.content}>
+          <Logo size="large" showText={true} style={styles.logoContainer} />
           <Text style={styles.title}>Create Account</Text>
           <Text style={styles.subtitle}>Sign up to get started</Text>
 
@@ -145,6 +147,9 @@ const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 400,
     alignSelf: 'center',
+  },
+  logoContainer: {
+    marginBottom: 16,
   },
   title: {
     fontSize: 32,
