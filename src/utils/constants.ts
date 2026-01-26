@@ -5,11 +5,19 @@ export const TOP_RECOMMENDATIONS_COUNT = 10;
 // API Configuration
 import { Platform } from 'react-native';
 
-// Determine the correct backend URL based on platform
+// Determine the correct backend URL based on platform and environment
 const getBackendUrl = (): string => {
+  // Check for production API URL from environment variable first
+  const productionUrl = process.env.EXPO_PUBLIC_API_URL;
+  
   if (!__DEV__) {
-    // Production - replace with your deployed backend URL
-    return 'https://your-backend-api.com/api';
+    // Production builds - use environment variable or fallback
+    if (productionUrl && productionUrl !== '' && !productionUrl.includes('your-backend')) {
+      return productionUrl;
+    }
+    // Return empty string if not configured - app should handle gracefully
+    console.warn('⚠️ Production API URL not configured. Set EXPO_PUBLIC_API_URL environment variable.');
+    return '';
   }
 
   // Development - use different URLs for different platforms
@@ -25,21 +33,11 @@ const getBackendUrl = (): string => {
   }
 };
 
-// For physical devices, you may need to use your computer's IP address
-// Your computer's IP: 192.168.1.210 (auto-detected)
-// 
-// To override the API URL, uncomment and update ONE of these:
-// For physical device (iPhone/iPad):
-// export const API_BASE_URL = 'http://192.168.1.210:3000/api';
-// For Android emulator (already handled automatically):
-// export const API_BASE_URL = 'http://10.0.2.2:3000/api';
-// For iOS Simulator (already handled automatically):
-// export const API_BASE_URL = 'http://localhost:3000/api';
+// Use the function to get the correct URL
+export const API_BASE_URL = getBackendUrl();
 
-// IMPORTANT: For iOS physical devices, you MUST use your computer's IP address
-// Uncomment the line below for physical device testing:
-export const API_BASE_URL = 'http://192.168.1.210:3000/api'; // For iOS physical device
-// export const API_BASE_URL = getBackendUrl(); // Use this for simulators/emulators
+// Check if API is configured
+export const isApiConfigured = API_BASE_URL !== '' && !API_BASE_URL.includes('your-backend');
 
 // Log the API URL being used (for debugging)
 if (__DEV__) {

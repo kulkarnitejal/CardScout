@@ -4,8 +4,21 @@ import * as SecureStore from 'expo-secure-store';
 
 // Get Supabase credentials from environment or constants
 // Replace these with your actual Supabase project URL and anon key
-const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || 'your-supabase-url';
-const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || 'your-supabase-anon-key';
+const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
+const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
+
+// Validate Supabase credentials
+const isValidSupabaseConfig = SUPABASE_URL && 
+  SUPABASE_ANON_KEY && 
+  SUPABASE_URL !== '' && 
+  SUPABASE_ANON_KEY !== '' &&
+  !SUPABASE_URL.includes('your-supabase') &&
+  !SUPABASE_ANON_KEY.includes('your-supabase');
+
+if (!isValidSupabaseConfig && !__DEV__) {
+  console.error('❌ Supabase credentials not configured!');
+  console.error('Please set EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY');
+}
 
 // Custom storage adapter using Expo SecureStore for secure token storage
 const ExpoSecureStoreAdapter = {
@@ -20,15 +33,27 @@ const ExpoSecureStoreAdapter = {
   },
 };
 
-// Create Supabase client
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: {
-    storage: ExpoSecureStoreAdapter,
-    autoRefreshToken: true,
-    persistSession: true,
-    detectSessionInUrl: false,
-  },
-});
+// Create Supabase client with fallback for missing credentials
+export const supabase = isValidSupabaseConfig
+  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        storage: ExpoSecureStoreAdapter,
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: false,
+      },
+    })
+  : createClient('https://placeholder.supabase.co', 'placeholder-key', {
+      auth: {
+        storage: ExpoSecureStoreAdapter,
+        autoRefreshToken: false,
+        persistSession: false,
+        detectSessionInUrl: false,
+      },
+    });
+
+// Export validation flag
+export const isSupabaseConfigured = isValidSupabaseConfig;
 
 // Database types (you can generate these later with Supabase CLI)
 export type Database = {

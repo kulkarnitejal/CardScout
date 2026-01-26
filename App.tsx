@@ -5,6 +5,7 @@ import { useFonts, Poppins_400Regular, Poppins_500Medium, Poppins_600SemiBold, P
 import { AppNavigator } from './src/navigation/AppNavigator';
 import { LoadingSpinner } from './src/components/LoadingSpinner';
 import { AuthProvider } from './src/contexts/AuthContext';
+import { ErrorBoundary } from './src/components/ErrorBoundary';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -19,11 +20,13 @@ export default function App() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <AuthProvider>
-      <AppNavigator />
-      <StatusBar style="light" />
-      </AuthProvider>
-    </GestureHandlerRootView>
+    <ErrorBoundary>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <AuthProvider>
+          <AppNavigator />
+          <StatusBar style="light" />
+        </AuthProvider>
+      </GestureHandlerRootView>
+    </ErrorBoundary>
   );
 }

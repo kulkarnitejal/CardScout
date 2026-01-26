@@ -20,10 +20,26 @@
       }
     },
     "production": {
+      "distribution": "store",
       "ios": {
         "simulator": false,
         "credentialsSource": "remote",
-        "autoIncrement": true
+        "autoIncrement": true,
+        "buildConfiguration": "Release"
+      },
+      "env": {
+        "EXPO_PUBLIC_ENV": "production",
+        "EXPO_PUBLIC_API_URL": "https://cardscout-production.up.railway.app/api"
+      }
+    },
+    "preview-testflight": {
+      "extends": "production",
+      "distribution": "internal",
+      "ios": {
+        "simulator": false
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://cardscout-production.up.railway.app/api"
       }
     }
   },
