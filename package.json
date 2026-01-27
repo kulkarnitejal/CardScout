@@ -16,6 +16,8 @@
     "build:android:preview": "eas build --platform android --profile preview",
     "build:ios:development": "eas build --platform ios --profile development",
     "build:android:development": "eas build --platform android --profile development",
+    "submit:ios": "eas submit --platform ios --profile production",
+    "submit:ios:latest": "eas submit --platform ios --profile production --latest",
     "type": "module"
   },
   "dependencies": {

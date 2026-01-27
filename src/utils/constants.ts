@@ -9,27 +9,45 @@ import { Platform } from 'react-native';
 const getBackendUrl = (): string => {
   // Check for production API URL from environment variable first
   const productionUrl = process.env.EXPO_PUBLIC_API_URL;
+  const isDev = __DEV__;
   
-  if (!__DEV__) {
-    // Production builds - use environment variable or fallback
-    if (productionUrl && productionUrl !== '' && !productionUrl.includes('your-backend')) {
-      return productionUrl;
-    }
-    // Return empty string if not configured - app should handle gracefully
-    console.warn('⚠️ Production API URL not configured. Set EXPO_PUBLIC_API_URL environment variable.');
+  // Log environment info (always log in production for debugging)
+  console.log('🔍 Environment Check:', {
+    __DEV__: isDev,
+    hasProductionUrl: !!productionUrl,
+    productionUrl: productionUrl || 'not set',
+    platform: Platform.OS,
+  });
+  
+  // Always check for environment variable first (works in both dev and prod)
+  if (productionUrl && productionUrl !== '' && !productionUrl.includes('your-backend')) {
+    console.log('✅ Using production API URL from environment:', productionUrl);
+    return productionUrl;
+  }
+  
+  // If in production build but no URL set, warn
+  if (!isDev) {
+    console.warn('⚠️ Production build detected but EXPO_PUBLIC_API_URL not set!');
+    console.warn('⚠️ Falling back to empty string - network requests will fail!');
     return '';
   }
 
   // Development - use different URLs for different platforms
   if (Platform.OS === 'android') {
     // Android emulator uses 10.0.2.2 to access host machine's localhost
-    return 'http://10.0.2.2:3000/api';
+    const devUrl = 'http://10.0.2.2:3000/api';
+    console.log('🔗 Using Android emulator URL:', devUrl);
+    return devUrl;
   } else if (Platform.OS === 'ios') {
     // iOS Simulator can use localhost
-    return 'http://localhost:3000/api';
+    const devUrl = 'http://localhost:3000/api';
+    console.log('🔗 Using iOS simulator URL:', devUrl);
+    return devUrl;
   } else {
     // Web or other platforms
-    return 'http://localhost:3000/api';
+    const devUrl = 'http://localhost:3000/api';
+    console.log('🔗 Using default dev URL:', devUrl);
+    return devUrl;
   }
 };
 
@@ -39,15 +57,9 @@ export const API_BASE_URL = getBackendUrl();
 // Check if API is configured
 export const isApiConfigured = API_BASE_URL !== '' && !API_BASE_URL.includes('your-backend');
 
-// Log the API URL being used (for debugging)
-if (__DEV__) {
-  console.log('🔗 API Base URL:', API_BASE_URL);
-  console.log('📱 Platform:', Platform.OS);
-  console.log('💡 If you see network errors, check:');
-  console.log('   1. Backend server is running on port 3000');
-  console.log('   2. Using correct URL for your platform');
-  console.log('   3. Device/emulator and computer are on same network');
-}
+// Always log the final API URL (important for production debugging)
+console.log('🌐 Final API Base URL:', API_BASE_URL);
+console.log('✅ API Configured:', isApiConfigured);
 
 // export const COLORS = {
 //   primary: '#B4654A',
