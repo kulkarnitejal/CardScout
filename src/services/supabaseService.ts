@@ -24,11 +24,39 @@ export const signUp = async (email: string, password: string) => {
 };
 
 export const signIn = async (email: string, password: string) => {
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
-  return { data, error };
+  try {
+    console.log('🔐 Attempting sign in for:', email);
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    
+    if (error) {
+      console.error('❌ Sign in error:', error.message);
+      console.error('Error details:', {
+        status: error.status,
+        message: error.message,
+      });
+    } else {
+      console.log('✅ Sign in successful');
+    }
+    
+    return { data, error };
+  } catch (err: any) {
+    console.error('❌ Sign in exception:', err);
+    console.error('Exception details:', {
+      message: err.message,
+      code: err.code,
+      stack: err.stack,
+    });
+    return { 
+      data: null, 
+      error: { 
+        message: err.message || 'Network request failed',
+        status: err.status || 500,
+      } 
+    };
+  }
 };
 
 export const signOut = async () => {

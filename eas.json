@@ -29,7 +29,9 @@
       },
       "env": {
         "EXPO_PUBLIC_ENV": "production",
-        "EXPO_PUBLIC_API_URL": "https://cardscout-production.up.railway.app/api"
+        "EXPO_PUBLIC_API_URL": "https://cardscout-production.up.railway.app/api",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://oelkghqrpobyyhmcwnrj.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9lbGtnaHFycG9ieXlobWN3bnJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMDkxNjksImV4cCI6MjA4MjU4NTE2OX0.530RT2OFziRfiTDzZRKqpTBPkyRte3K2p-BhPFfhSkk"
       }
     },
     "preview-testflight": {
@@ -39,7 +41,9 @@
         "simulator": false
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://cardscout-production.up.railway.app/api"
+        "EXPO_PUBLIC_API_URL": "https://cardscout-production.up.railway.app/api",
+        "EXPO_PUBLIC_SUPABASE_URL": "https://oelkghqrpobyyhmcwnrj.supabase.co",
+        "EXPO_PUBLIC_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9lbGtnaHFycG9ieXlobWN3bnJqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMDkxNjksImV4cCI6MjA4MjU4NTE2OX0.530RT2OFziRfiTDzZRKqpTBPkyRte3K2p-BhPFfhSkk"
       }
     }
   },

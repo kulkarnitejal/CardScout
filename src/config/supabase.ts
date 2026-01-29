@@ -7,6 +7,16 @@ import * as SecureStore from 'expo-secure-store';
 const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
 
+// Log Supabase configuration (always log for debugging)
+console.log('🔐 Supabase Config Check:', {
+  hasUrl: !!SUPABASE_URL,
+  hasKey: !!SUPABASE_ANON_KEY,
+  urlLength: SUPABASE_URL.length,
+  keyLength: SUPABASE_ANON_KEY.length,
+  urlPreview: SUPABASE_URL ? `${SUPABASE_URL.substring(0, 20)}...` : 'not set',
+  isDev: __DEV__,
+});
+
 // Validate Supabase credentials
 const isValidSupabaseConfig = SUPABASE_URL && 
   SUPABASE_ANON_KEY && 
@@ -15,9 +25,15 @@ const isValidSupabaseConfig = SUPABASE_URL &&
   !SUPABASE_URL.includes('your-supabase') &&
   !SUPABASE_ANON_KEY.includes('your-supabase');
 
-if (!isValidSupabaseConfig && !__DEV__) {
+if (!isValidSupabaseConfig) {
   console.error('❌ Supabase credentials not configured!');
-  console.error('Please set EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY');
+  console.error('URL:', SUPABASE_URL || 'NOT SET');
+  console.error('Key:', SUPABASE_ANON_KEY ? 'SET (hidden)' : 'NOT SET');
+  console.error('Please set EXPO_PUBLIC_SUPABASE_URL and EXPO_PUBLIC_SUPABASE_ANON_KEY in eas.json');
+  
+  if (!__DEV__) {
+    console.error('⚠️ This will cause authentication to fail in production!');
+  }
 }
 
 // Custom storage adapter using Expo SecureStore for secure token storage

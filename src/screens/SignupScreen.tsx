@@ -63,7 +63,7 @@ export const SignupScreen: React.FC<{ navigation: any }> = ({ navigation }) => {
     >
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <View style={styles.content}>
-          <Logo size="large" showText={true} style={styles.logoContainer} />
+          <Logo size="large" showText={false} style={styles.logoContainer} />
           <Text style={styles.title}>Create Account</Text>
           <Text style={styles.subtitle}>Sign up to get started</Text>
 
