@@ -16,9 +16,18 @@ type GiftCardInsert = Database['public']['Tables']['gift_cards']['Insert'];
 // ============================================
 
 export const signUp = async (email: string, password: string) => {
+  // Get the redirect URL for email confirmation
+  // In production, this should be your app's deep link URL
+  const redirectTo = __DEV__ 
+    ? 'exp://localhost:8081/--/auth/callback' // Development
+    : 'cardscout://auth/callback'; // Production - deep link to your app
+  
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
+    options: {
+      emailRedirectTo: redirectTo,
+    },
   });
   return { data, error };
 };
