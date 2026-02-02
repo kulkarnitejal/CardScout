@@ -320,11 +320,7 @@ export const PlaidConnectScreen: React.FC = () => {
             </Text>
           </TouchableOpacity>
 
-          <View style={styles.noteContainer}>
-            <Text style={styles.noteText}>
-              Note: Plaid integration requires a backend server. Currently, the app uses mock transaction data for demonstration purposes.
-            </Text>
-          </View>
+    
         </ScrollView>
         <MenuModal visible={menuVisible} onClose={() => setMenuVisible(false)} />
       </View>
