@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '../config/supabase';
-import { getSession, getCurrentUser, signOut as supabaseSignOut } from '../services/supabaseService';
+import { getSession, getCurrentUser, signOut as supabaseSignOut, deleteUserAccount } from '../services/supabaseService';
 
 interface AuthContextType {
   user: User | null;
@@ -10,6 +10,7 @@ interface AuthContextType {
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signUp: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  deleteAccount: () => Promise<{ error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -85,8 +86,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
+  const deleteAccount = async () => {
+    try {
+      const currentUser = await getCurrentUser();
+      if (!currentUser) {
+        return { error: { message: 'No user logged in', status: 401 } };
+      }
+
+      const { error } = await deleteUserAccount(currentUser.id);
+      
+      if (error) {
+        return { error };
+      }
+
+      // Clear user state after successful deletion
+      setUser(null);
+      setSession(null);
+      
+      return { error: null };
+    } catch (error: any) {
+      console.error('Error deleting account:', error);
+      return { 
+        error: { 
+          message: error.message || 'Failed to delete account',
+          status: 500,
+        } 
+      };
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut, deleteAccount }}>
       {children}
     </AuthContext.Provider>
   );
