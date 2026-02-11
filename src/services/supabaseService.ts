@@ -1,6 +1,7 @@
 import { supabase } from '../config/supabase';
 import type { Database } from '../config/supabase';
 import { calculateDiscountPercent } from '../utils/formatters';
+import { API_BASE_URL } from '../utils/constants';
 
 type PlaidItem = Database['public']['Tables']['plaid_items']['Row'];
 type PlaidItemInsert = Database['public']['Tables']['plaid_items']['Insert'];
@@ -341,11 +342,11 @@ export const deleteGiftCard = async (id: string) => {
 
 /**
  * Deletes a user account and all associated data from Supabase.
- * This includes:
- * - All transactions
- * - All accounts (linked to plaid_items)
- * - All plaid_items
- * - The user account from auth
+ * This function calls the server endpoint which has admin privileges to:
+ * - Delete all transactions
+ * - Delete all accounts (linked to plaid_items)
+ * - Delete all plaid_items
+ * - Delete the user from auth.users (full deletion)
  * 
  * @param userId - The user ID to delete
  * @returns Object with error if deletion fails
@@ -353,6 +354,54 @@ export const deleteGiftCard = async (id: string) => {
 export const deleteUserAccount = async (userId: string) => {
   try {
     console.log('🗑️ Starting account deletion for user:', userId);
+
+    // Get the current session to get the access token
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError || !session) {
+      console.error('❌ Error getting session:', sessionError);
+      return { 
+        error: { 
+          message: 'No active session. Please sign in again.',
+          status: 401,
+        } 
+      };
+    }
+
+    // Try to call the server endpoint first (full deletion including auth.users)
+    if (API_BASE_URL && API_BASE_URL !== '') {
+      try {
+        console.log('📡 Calling server endpoint for account deletion...');
+        const response = await fetch(`${API_BASE_URL}/user/delete`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${session.access_token}`,
+          },
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          console.error('❌ Server endpoint error:', data);
+          // Fall through to client-side deletion as fallback
+        } else {
+          console.log('✅ Account deleted successfully via server endpoint');
+          // Sign out the user
+          await supabase.auth.signOut();
+          return { error: null };
+        }
+      } catch (serverError: any) {
+        console.warn('⚠️ Server endpoint failed, falling back to client-side deletion:', serverError.message);
+        // Fall through to client-side deletion as fallback
+      }
+    } else {
+      console.warn('⚠️ API_BASE_URL not configured, using client-side deletion only');
+    }
+
+    // Fallback: Client-side deletion (deletes data but not auth.users)
+    // This is used if server endpoint is not available or fails
+    console.log('🔄 Using client-side deletion (data only, auth.users will remain)...');
 
     // Step 1: Get all plaid_items for this user
     const { data: plaidItems, error: plaidItemsError } = await getPlaidItems(userId);
@@ -400,15 +449,11 @@ export const deleteUserAccount = async (userId: string) => {
     }
 
     // Step 5: Sign out the user to invalidate their session
-    // Note: Deleting the user from auth.users requires admin privileges (service role key)
-    // which should not be exposed in the client. All user data has been deleted above.
-    // The user record in auth.users will remain, but they won't have any data.
-    // For production, consider creating a server-side function or database trigger
-    // to handle full user deletion from auth.users table.
+    // Note: Without server endpoint, the user record in auth.users will remain
     await supabase.auth.signOut();
 
-    console.log('✅ Account deletion completed successfully');
-    console.log('ℹ️ Note: User data has been deleted. Auth user record remains (requires admin to delete).');
+    console.log('✅ Account deletion completed (data deleted, auth.users record remains)');
+    console.log('ℹ️ Note: For full deletion including auth.users, ensure server endpoint is configured.');
     return { error: null };
   } catch (error: any) {
     console.error('❌ Error during account deletion:', error);

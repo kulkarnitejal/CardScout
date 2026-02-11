@@ -34,7 +34,7 @@ interface MenuModalProps {
 export const MenuModal: React.FC<MenuModalProps> = ({ visible, onClose }) => {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<MenuModalNavigationProp>();
-  const { user, signOut } = useAuth();
+  const { user, signOut, deleteAccount } = useAuth();
   const slideAnim = useRef(new Animated.Value(-280)).current; // Start off-screen to the left
   const [modalVisible, setModalVisible] = useState(visible);
 
@@ -114,6 +114,65 @@ export const MenuModal: React.FC<MenuModalProps> = ({ visible, onClose }) => {
     onClose();
   };
 
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      'Delete Account',
+      'This action cannot be undone. All your data including transactions, bank connections, and account information will be permanently deleted.',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            // Second confirmation to ensure user really wants to delete
+            Alert.alert(
+              'Confirm Deletion',
+              'Are you absolutely sure you want to delete your account? This will permanently remove all your data.',
+              [
+                {
+                  text: 'Cancel',
+                  style: 'cancel',
+                },
+                {
+                  text: 'Yes, Delete My Account',
+                  style: 'destructive',
+                  onPress: async () => {
+                    try {
+                      const { error } = await deleteAccount();
+                      if (error) {
+                        Alert.alert(
+                          'Error',
+                          error.message || 'Failed to delete account. Please try again or contact support.',
+                          [{ text: 'OK' }]
+                        );
+                      } else {
+                        Alert.alert(
+                          'Account Deleted',
+                          'Your account and all associated data have been deleted.',
+                          [{ text: 'OK' }]
+                        );
+                        onClose();
+                      }
+                    } catch (error: any) {
+                      Alert.alert(
+                        'Error',
+                        'An unexpected error occurred. Please try again or contact support.',
+                        [{ text: 'OK' }]
+                      );
+                    }
+                  },
+                },
+              ]
+            );
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <Modal
       visible={modalVisible}
@@ -178,6 +237,25 @@ export const MenuModal: React.FC<MenuModalProps> = ({ visible, onClose }) => {
                     style={styles.menuIcon}
                   />
                   <Text style={styles.menuText}>Report Bug / Request Feature</Text>
+                  <MaterialCommunityIcons
+                    name="chevron-right"
+                    size={20}
+                    color={COLORS.textSecondary}
+                  />
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.menuItem}
+                  onPress={handleDeleteAccount}
+                  activeOpacity={0.7}
+                >
+                  <MaterialCommunityIcons
+                    name="account-remove"
+                    size={24}
+                    color={COLORS.error}
+                    style={styles.menuIcon}
+                  />
+                  <Text style={[styles.menuText, styles.deleteAccountText]}>Delete Account</Text>
                   <MaterialCommunityIcons
                     name="chevron-right"
                     size={20}
@@ -276,6 +354,9 @@ const styles = StyleSheet.create({
     color: COLORS.text,
   },
   signOutText: {
+    color: COLORS.error,
+  },
+  deleteAccountText: {
     color: COLORS.error,
   },
 });

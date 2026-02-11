@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import plaidRoutes from './plaid.routes';
+import userRoutes from './user.routes';
 
 const router = Router();
 
@@ -18,6 +19,9 @@ router.get('/', (req, res) => {
         getTransactions: 'POST /api/plaid/transactions',
         getAccounts: 'POST /api/plaid/accounts',
       },
+      user: {
+        deleteAccount: 'DELETE /api/user/delete',
+      },
     },
   });
 });
@@ -33,6 +37,9 @@ router.get('/health', (req, res) => {
 
 // Plaid routes
 router.use('/plaid', plaidRoutes);
+
+// User routes
+router.use('/user', userRoutes);
 
 export default router;
 
